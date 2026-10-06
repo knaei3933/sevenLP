@@ -1020,11 +1020,12 @@ header .version-badge { display: none; }
     display: block !important;
   }
   body[data-simulator-print="ui"] .quick-guide,
-  body[data-simulator-print="ui"] details,
   body[data-simulator-print="ui"] .panel,
   body[data-simulator-print="ui"] .recommendation-modal {
     break-inside: avoid;
   }
+  body[data-simulator-print="ui"] details { break-inside: auto; }
+  body[data-simulator-print="ui"] .cost-block { break-inside: avoid; }
 }
 
 .customer-list-layer { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 18px; }
