@@ -106,9 +106,10 @@ function isSameOrigin(request: Request): boolean {
   if (!origin || !host) return false;
 
   try {
-    const requestUrl = new URL(request.url);
     const originUrl = new URL(origin);
-    return requestUrl.host === host && originUrl.origin === requestUrl.origin;
+    const sameHost = originUrl.host === host;
+    const secureOrLocalProtocol = ["http:", "https:"].includes(originUrl.protocol);
+    return sameHost && secureOrLocalProtocol;
   } catch {
     return false;
   }

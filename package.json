@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "verify:public-lab-client": "node scripts/verify-public-lab-client.mjs"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.0",
