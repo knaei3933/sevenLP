@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import LoginForm from "@/app/login/login-form";
+import LoginForm from "@/app/(quotation-suite)/login/login-form";
 
 const assign = vi.fn();
 

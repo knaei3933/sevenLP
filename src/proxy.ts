@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = new Set(["/login"]);
+const PUBLIC_PATHS = new Set(["/login", "/lab", "/lab/"]);
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

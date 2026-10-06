@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import HistoryClient from "@/app/history/history-client";
+import HistoryClient from "@/app/(quotation-suite)/history/history-client";
 import type { AuthenticatedUser } from "@/lib/auth-store";
 import type { QuotationRecord } from "@/lib/quotation-shared";
 
