@@ -171,7 +171,7 @@ export async function savePublicLead(
   const createdAt = toIsoDate(options.createdAt ?? new Date());
 
   for (let attempt = 1; attempt <= MAX_REFERENCE_ATTEMPTS; attempt += 1) {
-    const reference = nextReference();
+    const reference = referenceGenerator();
     db.exec("BEGIN IMMEDIATE");
     try {
       db.prepare(`
@@ -218,13 +218,12 @@ export async function savePublicQuotation(
     throw new PublicLeadStoreError("invalid_calculation_version");
   }
   const resultHash = validateResultHash(input.resultHash);
-  if (!calculationVersion) throw new PublicLeadStoreError("invalid_calculation_version");
 
   const db = await getDatabase();
   const createdAt = toIsoDate(options.createdAt ?? new Date());
   for (let attempt = 1; attempt <= MAX_REFERENCE_ATTEMPTS; attempt += 1) {
-    const leadReference = nextReference();
-    const quotationReference = nextReference();
+    const leadReference = referenceGenerator();
+    const quotationReference = referenceGenerator();
     const quote = structuredClone(safeQuote);
     quote.reference = quotationReference;
     const quoteJson = JSON.stringify(quote);
@@ -602,10 +601,6 @@ function normalizeLimit(value: number): number {
 function createServerReference(): string {
   const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
   return `PL-${date}-${randomBytes(12).toString("hex").toUpperCase()}`;
-}
-
-function nextReference(): string {
-  return referenceGenerator();
 }
 
 function isReferenceCollision(error: unknown): boolean {

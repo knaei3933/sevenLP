@@ -293,18 +293,6 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
     };
   }
 
-  if (requestType === "consultation") {
-    return {
-      success: true,
-      data: {
-        requestType,
-        ...lead,
-        ...(message === undefined ? {} : { message }),
-        ...consent,
-      },
-    };
-  }
-
   return {
     success: true,
     data: {
