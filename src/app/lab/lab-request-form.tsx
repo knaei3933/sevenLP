@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 import { PUBLIC_LAB_CONSENT_VERSION } from "@/lib/public-lab";
 import {
@@ -129,6 +129,7 @@ export function LabRequestForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [summaryError, setSummaryError] = useState("");
   const [result, setResult] = useState<ApiQuote | ApiConfirmation | null>(null);
+  const quoteResultHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const tabRefs = useRef<Record<PublicLabRequestType, HTMLButtonElement | null>>({
     quotation: null,
     consultation: null,
@@ -142,6 +143,10 @@ export function LabRequestForm() {
   const sizeLabel = publicLabSizeOptions.find((option) => option.key === technical.sizeKey)?.label ?? "";
   const fillingLabel = publicLabFillingMethodOptions.find((option) => option.value === technical.fillingMethod)?.label ?? "";
   const printingLabel = publicLabPrintingMethodOptions.find((option) => option.value === technical.printingMethod)?.label ?? "";
+
+  useEffect(() => {
+    if (result?.requestType === "quotation") quoteResultHeadingRef.current?.focus();
+  }, [result]);
 
   function changeRequestType(nextType: PublicLabRequestType) {
     setRequestType(nextType);
@@ -283,8 +288,13 @@ export function LabRequestForm() {
 
   if (result) {
     return isApiQuote(result) ? (
-      <section className={styles.result} aria-labelledby="lab-quote-result-heading">
-        <h3 className={styles.resultTitle} id="lab-quote-result-heading">お見積りが発行されました</h3>
+      <section className={styles.result} aria-labelledby="lab-quote-result-heading" role="status">
+        <h3
+          className={styles.resultTitle}
+          id="lab-quote-result-heading"
+          ref={quoteResultHeadingRef}
+          tabIndex={-1}
+        >お見積りが発行されました</h3>
         <dl className={styles.resultGrid}>
           <div><dt>参照番号</dt><dd data-testid="quote-reference">{result.reference}</dd></div>
           <div><dt>発行日時</dt><dd>{formatDateTime(result.createdAt)}</dd></div>

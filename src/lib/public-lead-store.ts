@@ -9,7 +9,11 @@ import type {
   PublicLabRequest,
   PublicLabSampleRequest,
 } from "./public-lab";
-import type { PublicLabRequestType } from "./public-lab-options";
+import {
+  publicLabPrintingMethodOptions,
+  publicLabSizeOptions,
+  type PublicLabRequestType,
+} from "./public-lab-options";
 import { validatePublicLabRequest } from "./public-lab";
 import type { PublicLabQuote } from "./public-lab-quote.server";
 
@@ -40,6 +44,15 @@ const PUBLIC_QUOTE_KEYS = [
   "validUntil",
 ] as const;
 const MONEY_PATTERN = /^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/;
+const INTEGER_PATTERN = /^[1-9][0-9]*$/;
+const PUBLIC_QUOTE_REFERENCE_PATTERN = /^PL-[0-9]{8}-[0-9A-F]{16,28}$/;
+const PUBLIC_QUOTE_EXCLUSIONS = [
+  "お客様支給の充填物（中身）の費用は含まれません。",
+  "法規対応費、試験費、デザイン制作費、オプション包装費は含まれません。",
+] as const;
+const PUBLIC_QUOTE_DELIVERY_NOTE = "納期はお約束できません。";
+const PUBLIC_QUOTE_CONSULTATION_CTA = "お問い合わせ・相談はこちら";
+const PUBLIC_QUOTE_SAMPLE_CTA = "サンプル依頼はこちら";
 
 export class PublicLeadStoreError extends Error {
   readonly code: string;
@@ -138,6 +151,7 @@ interface QuotationRow {
 
 let database: DatabaseSync | null = null;
 let databasePath: string | null = null;
+let databasePromise: Promise<DatabaseSync> | null = null;
 let referenceGenerator: () => string = createServerReference;
 
 export function resolvePublicLeadDatabasePath(
@@ -348,6 +362,7 @@ export async function listPublicQuotations({
 export async function closePublicLeadStoreForTest(): Promise<void> {
   database?.close();
   database = null;
+  databasePromise = null;
 }
 
 /** Test-only accessor for schema, constraint, pragma, and rollback assertions. */
@@ -377,7 +392,25 @@ export function setReferenceGeneratorForTest(generator?: () => string): void {
 
 async function getDatabase(): Promise<DatabaseSync> {
   if (database) return database;
-  const path = resolvePublicLeadDatabasePath();
+  databasePromise ??= initializeDatabase(resolvePublicLeadDatabasePath());
+  return databasePromise;
+}
+
+async function initializeDatabase(path: string): Promise<DatabaseSync> {
+  let openedDatabase: DatabaseSync | null = null;
+  try {
+    openedDatabase = await openAndMigrateDatabase(path);
+    database = openedDatabase;
+    databasePath = path;
+    return openedDatabase;
+  } catch (error) {
+    openedDatabase?.close();
+    databasePromise = null;
+    throw error;
+  }
+}
+
+async function openAndMigrateDatabase(path: string): Promise<DatabaseSync> {
   await mkdir(dirname(path), { recursive: true });
   const initializedDatabase = new DatabaseSync(path, {
     enableForeignKeyConstraints: true,
@@ -417,9 +450,7 @@ async function getDatabase(): Promise<DatabaseSync> {
       ON public_quotations(lead_id);
   `);
 
-  database = initializedDatabase;
-  databasePath = path;
-  return database;
+  return initializedDatabase;
 }
 
 function createLeadPredicates(filter: PublicLeadCountFilter): {
@@ -541,6 +572,31 @@ function validateCustomerSafeQuote(
   if (!Array.isArray(quote.exclusions) || quote.exclusions.some((item) => typeof item !== "string")) {
     throw new PublicLeadStoreError("invalid_public_quote");
   }
+  if (!PUBLIC_QUOTE_REFERENCE_PATTERN.test(quote.reference)) {
+    throw new PublicLeadStoreError("invalid_public_quote");
+  }
+  if (!INTEGER_PATTERN.test(quote.requestedQuantity) || !INTEGER_PATTERN.test(quote.billedQuantity)) {
+    throw new PublicLeadStoreError("invalid_public_quote");
+  }
+  if (quote.serviceRouteLabel !== expectedServiceRouteLabel(request.printingMethod)) {
+    throw new PublicLeadStoreError("unsafe_public_quote");
+  }
+  if (quote.requestSummary !== expectedPublicQuoteSummary(request)) {
+    throw new PublicLeadStoreError("unsafe_public_quote");
+  }
+  if (
+    quote.deliveryNote !== PUBLIC_QUOTE_DELIVERY_NOTE
+    || quote.consultationCta !== PUBLIC_QUOTE_CONSULTATION_CTA
+    || quote.sampleCta !== PUBLIC_QUOTE_SAMPLE_CTA
+  ) {
+    throw new PublicLeadStoreError("unsafe_public_quote");
+  }
+  if (
+    quote.exclusions.length !== PUBLIC_QUOTE_EXCLUSIONS.length
+    || PUBLIC_QUOTE_EXCLUSIONS.some((exclusion, index) => quote.exclusions[index] !== exclusion)
+  ) {
+    throw new PublicLeadStoreError("unsafe_public_quote");
+  }
   for (const key of ["pricePerPiece", "subtotal", "tax", "grandTotal"] as const) {
     if (!MONEY_PATTERN.test(quote[key])) throw new PublicLeadStoreError("invalid_public_quote");
   }
@@ -548,18 +604,27 @@ function validateCustomerSafeQuote(
     throw new PublicLeadStoreError("invalid_public_quote");
   }
 
-  const serialized = JSON.stringify(quote);
-  const prohibitedValues = [
-    request.company,
-    request.contactName,
-    request.email,
-    request.phone,
-    request.message,
-  ].filter((value): value is string => Boolean(value));
-  if (prohibitedValues.some((value) => serialized.includes(value))) {
-    throw new PublicLeadStoreError("unsafe_public_quote");
-  }
   return structuredClone(quote);
+}
+
+function expectedServiceRouteLabel(printingMethod: PublicLabQuotationRequest["printingMethod"]): string {
+  return publicLabPrintingMethodOptions.find((option) => option.value === printingMethod)?.label
+    ?? (() => { throw new PublicLeadStoreError("invalid_public_quote"); })();
+}
+
+function expectedPublicQuoteSummary(request: PublicLabQuotationRequest): string {
+  const sizeLabel = publicLabSizeOptions.find((option) => option.key === request.sizeKey)?.label;
+  const fillingLabel = request.fillingMethod === "hopper" ? "ホッパー" : "加圧";
+  const printingLabel = expectedServiceRouteLabel(request.printingMethod);
+  if (!sizeLabel) throw new PublicLeadStoreError("invalid_public_quote");
+
+  return [
+    `希望サイズ: ${sizeLabel}`,
+    `希望数量: ${request.quantity.toLocaleString("ja-JP")}枚`,
+    `印刷: ${printingLabel.replace("印刷", "")}`,
+    `充填: ${fillingLabel}`,
+    `色数: ${request.colorCount}色`,
+  ].join("／");
 }
 
 function validateResultHash(value: string): string {

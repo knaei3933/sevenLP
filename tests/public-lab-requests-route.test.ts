@@ -189,6 +189,7 @@ function validateFixture(input: typeof quotationBase) {
 }
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await resetPublicLeadStoreForTest({ deleteDatabase: true });
   setReferenceGeneratorForTest();
   delete process.env.G006_FAIL_CALCULATION;
@@ -359,12 +360,25 @@ describe("POST /api/public/lab/requests", () => {
 
   it("maps calculation failure to a safe response without persistence", async () => {
     process.env.G006_FAIL_CALCULATION = "1";
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await POST(publicRequest(JSON.stringify(quotationBase)));
     const payload = await jsonOf(response);
 
     expect(response.status).toBe(503);
     expect(payload).toEqual({ error: "quotation_unavailable" });
     expectNoInternalValues(payload);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    const log = JSON.parse(errorSpy.mock.calls[0]?.[0] as string);
+    expect(log).toMatchObject({
+      event: "public_lab_request_failed",
+      outcome: "error",
+      requestType: "quotation",
+    });
+    expect(log.durationMs).toBeGreaterThanOrEqual(0);
+    expect(Object.keys(log).sort()).toEqual([
+      "durationMs", "event", "outcome", "requestType",
+    ]);
+    errorSpy.mockRestore();
     expect(await countPublicLeads()).toBe(0);
     expect(await countPublicQuotations()).toBe(0);
   });

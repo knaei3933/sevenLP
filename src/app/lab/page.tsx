@@ -4,8 +4,8 @@ import { LabRequestForm } from "./lab-request-form";
 
 export default function LabPage() {
   return (
-    <>
-      <section className={`${styles.hero} ${styles.section}`} aria-labelledby="lab-brand">
+    <main className={styles.main}>
+      <header className={`${styles.hero} ${styles.section}`} aria-labelledby="lab-brand">
         <div className={styles.inner}>
           <p className={styles.kicker}>Epackage Lab</p>
           <h1 id="lab-brand" className={styles.brand}>パウチ充填ラボ</h1>
@@ -18,7 +18,7 @@ export default function LabPage() {
             <a className={styles.secondaryAction} href="#lab-contact">サンプル・相談</a>
           </div>
         </div>
-      </section>
+      </header>
 
       <section id="lab-process" className={styles.section} aria-labelledby="lab-process-heading">
         <div className={styles.inner}>
@@ -63,7 +63,7 @@ export default function LabPage() {
         </div>
       </section>
 
-      <section id="lab-contact" className={styles.section} aria-labelledby="lab-contact-heading">
+      <footer id="lab-contact" className={styles.section} aria-labelledby="lab-contact-heading">
         <div className={styles.inner}>
           <h2 className={styles.sectionHeading} id="lab-contact-heading">サンプル・ご相談</h2>
           <p className={styles.body}>
@@ -79,7 +79,7 @@ export default function LabPage() {
             </ul>
           </address>
         </div>
-      </section>
-    </>
+      </footer>
+    </main>
   );
 }

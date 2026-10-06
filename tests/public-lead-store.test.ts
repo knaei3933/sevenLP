@@ -430,4 +430,24 @@ describe("public lead SQLite store", () => {
     expect(quotations).toHaveLength(1);
     expect(quotations[0].quote.requestType).toBe("quotation");
   });
+
+  it("accepts contract-valid one-character lead values without accidental DTO substring rejection", async () => {
+    const request = createQuotationFixture({
+      company: "X",
+      contactName: "X",
+    });
+    const result = await savePublicQuotation(request, { createdAt: FIXED_NOW });
+
+    expect(result.quote.reference).toMatch(/^PL-[0-9]{8}-[0-9A-F]{16,28}$/);
+    expect(await countPublicLeads({ requestType: "quotation" })).toBe(1);
+    expect(await countPublicQuotations()).toBe(1);
+  });
+
+  it("reuses one initialized database connection for concurrent cold starts", async () => {
+    const [first, second] = await Promise.all([
+      getPublicLeadDatabaseForTest(),
+      getPublicLeadDatabaseForTest(),
+    ]);
+    expect(second).toBe(first);
+  });
 });

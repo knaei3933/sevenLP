@@ -31,6 +31,60 @@ async function fillLead(page: Page, email: string) {
   await page.getByTestId("lab-phone").fill("03-0000-0000");
 }
 
+async function semanticAccessibilityEvidence(page: Page) {
+  return page.evaluate(() => {
+    const channels = (value: string) => {
+      const match = value.match(/rgba?\(([^)]+)\)/)?.[1]?.split(",").map((part) => Number(part.trim())) ?? null;
+      return match ? [...match.slice(0, 3), match[3] ?? 1] : null;
+    };
+    const luminance = ([red, green, blue]: number[]) => {
+      const channel = (value: number) => {
+        const normalized = value / 255;
+        return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
+    };
+    const backgroundFor = (element: Element): HTMLElement => {
+      let current = element as HTMLElement;
+      while (current) {
+        const background = channels(getComputedStyle(current).backgroundColor);
+        if (background && background[3] > 0) return current;
+        current = current.parentElement as HTMLElement;
+      }
+      return document.body;
+    };
+    const ratio = (element: Element) => {
+      const style = getComputedStyle(element);
+      const foreground = channels(style.color);
+      const background = channels(getComputedStyle(backgroundFor(element)).backgroundColor);
+      if (!foreground || !background) return 0;
+      const first = luminance(foreground);
+      const second = luminance(background);
+      return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+    };
+    const headingLevels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")]
+      .filter((element) => (element as HTMLElement).offsetParent !== null)
+      .map((element) => Number(element.tagName.charAt(1)));
+    const invalidHeadingJumps = headingLevels.filter((level, index) => index > 0 && level - headingLevels[index - 1] > 1);
+    const sample = [document.body, document.querySelector("h1"), document.querySelector("[class*='sectionHeading']")]
+      .filter((element): element is HTMLElement => Boolean(element));
+    const submit = document.querySelector<HTMLButtonElement>("button[type='submit']");
+    if (submit) sample.push(submit);
+
+    return {
+      mainCount: document.querySelectorAll("main").length,
+      bannerCount: document.querySelectorAll("header").length,
+      contentInfoCount: document.querySelectorAll("footer").length,
+      headingCount: headingLevels.length,
+      invalidHeadingJumps,
+      contrast: sample.map((element) => ({
+        text: element.textContent?.trim().slice(0, 40) ?? "",
+        ratio: Number(ratio(element).toFixed(2)),
+      })),
+    };
+  });
+}
+
 test("keeps /lab and /lab/ anonymous and shows the Japanese public identity", async ({ page }) => {
   for (const path of ["/lab", "/lab/"]) {
     await page.goto(path);
@@ -88,6 +142,7 @@ test("releases a quotation only after a valid lead submission", async ({ page },
   await expect(page.getByTestId("quote-reference")).toHaveText(quote.reference);
   await expect(page.getByTestId("released-grand-total")).toHaveText(`¥${quote.grandTotal}`);
   await expect(page.getByTestId("lab-submit")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "お見積りが発行されました" })).toBeFocused();
 });
 
 test("accepts an anonymous consultation without releasing a quote", async ({ page }, testInfo) => {
@@ -166,6 +221,19 @@ test("passes basic keyboard, label, and mobile accessibility checks", async ({ p
   await expect(page.getByTestId("lab-company")).toHaveAttribute("aria-invalid", "true");
   await expect(page.getByTestId("lab-company")).toHaveAttribute("aria-describedby", "lab-company-error");
 
+  const semanticAccessibility = await semanticAccessibilityEvidence(page);
+  expect(semanticAccessibility.mainCount).toBe(1);
+  expect(semanticAccessibility.bannerCount).toBe(1);
+  expect(semanticAccessibility.contentInfoCount).toBe(1);
+  expect(semanticAccessibility.headingCount).toBeGreaterThan(4);
+  expect(semanticAccessibility.invalidHeadingJumps).toEqual([]);
+  for (const item of semanticAccessibility.contrast.slice(0, 3)) {
+    expect(item.ratio).toBeGreaterThanOrEqual(4.5);
+  }
+  if (semanticAccessibility.contrast.length > 3) {
+    expect(semanticAccessibility.contrast.at(-1)?.ratio).toBeGreaterThanOrEqual(3);
+  }
+
   if (testInfo.project.name === "public-anonymous-mobile") {
     const overflow = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
@@ -178,7 +246,7 @@ test("passes basic keyboard, label, and mobile accessibility checks", async ({ p
 
   const ariaSnapshot = await page.locator("body").ariaSnapshot();
   expect(ariaSnapshot.length).toBeGreaterThan(100);
-  const artifactDir = process.env.G008_ARTIFACT_DIR ?? join(process.cwd(), ".verification", "g008-e2e");
+  const artifactDir = process.env.G009_ARTIFACT_DIR ?? join(process.cwd(), ".verification", "g009-e2e");
   await mkdir(artifactDir, { recursive: true });
   await writeFile(
     join(artifactDir, `public-lab-accessibility-${testInfo.project.name}.json`),
@@ -186,6 +254,7 @@ test("passes basic keyboard, label, and mobile accessibility checks", async ({ p
       url: page.url(),
       title: await page.title(),
       focus: focusStyle,
+      semanticAccessibility,
       labeledControls: true,
       keyboardTabs: true,
       errorAssociation: true,

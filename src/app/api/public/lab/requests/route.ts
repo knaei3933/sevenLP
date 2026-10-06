@@ -60,8 +60,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   const result = validatePublicLabRequest(input);
   if (!result.success) return json({ errors: result.errors }, 400);
 
+  const startedAtMs = Date.now();
+  const { requestType } = result.data;
   try {
-    if (result.data.requestType === "quotation") {
+    if (requestType === "quotation") {
       const calculation = createPublicLabQuote(result.data);
       const persisted = await savePublicQuotation({
         request: result.data,
@@ -75,10 +77,18 @@ export async function POST(request: Request): Promise<NextResponse> {
     const saved = await savePublicLead(result.data);
     return json({
       reference: saved.reference,
-      requestType: saved.requestType,
+      requestType,
       message: "受け付けました。担当からご連絡いたします。",
     } satisfies SafeConfirmation, 201);
   } catch {
+    // Payload-free operational evidence only. Never log contact fields, the
+    // request body, quote payload, database text, or an internal error object.
+    console.error(JSON.stringify({
+      event: "public_lab_request_failed",
+      outcome: "error",
+      requestType,
+      durationMs: Date.now() - startedAtMs,
+    }));
     if (result.data.requestType === "quotation") {
       return json({ error: "quotation_unavailable" }, 503);
     }
