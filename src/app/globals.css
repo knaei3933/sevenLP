@@ -1,16 +1,18 @@
 :root {
-  --background: #f5f7fb;
-  --surface: #ffffff;
-  --ink: #17213a;
-  --muted: #526075;
-  --line: #d7deea;
-  --primary: #17487b;
-  --primary-strong: #0e355d;
-  --accent: #d9f0ff;
-  --danger: #b42318;
-  --warning: #8a5a00;
-  --warning-bg: #fff4d6;
-  --focus: #2b7acf;
+  /* Global surfaces remain compatible with the internal quotation suite while
+   * deriving their visual values from the shared G006 token contract. */
+  --background: var(--sp-canvas);
+  --surface: var(--sp-surface);
+  --ink: var(--sp-ink);
+  --muted: var(--sp-ink-muted);
+  --line: var(--sp-border);
+  --primary: var(--sp-brand);
+  --primary-strong: var(--sp-brand-hover);
+  --accent: var(--sp-canvas-soft);
+  --danger: var(--sp-danger);
+  --warning: var(--sp-warning);
+  --warning-bg: var(--sp-warning-surface);
+  --focus: var(--sp-focus);
   --global-header-height: 62px;
 }
 
@@ -20,6 +22,17 @@ body { margin: 0; max-width: 100%; background: var(--background); color: var(--i
 main { max-width: 1440px; margin: 0 auto; padding: 24px; }
 a { color: var(--primary); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
 
 .app-shell { display: flex; flex-direction: column; gap: 18px; }
 .app-header { display: flex; align-items: end; justify-content: space-between; gap: 16px; }

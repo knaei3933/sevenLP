@@ -1,0 +1,74 @@
+{
+  "version": "g006-v1",
+  "color": {
+    "canvas": "#fdf7f6",
+    "canvasSoft": "#f9ece9",
+    "surface": "#ffffff",
+    "surfaceMuted": "#fff9f8",
+    "border": "#d8b7b3",
+    "borderStrong": "#bf918d",
+    "ink": "#241c1e",
+    "inkMuted": "#5f4c4f",
+    "brand": "#a24a52",
+    "brandHover": "#842c35",
+    "brandDeep": "#54232e",
+    "onBrand": "#ffffff",
+    "footer": "#4a2129",
+    "danger": "#a3221b",
+    "dangerSurface": "#fff1f0",
+    "dangerBorder": "#dc9f99",
+    "success": "#136b43",
+    "successSurface": "#edf7f1",
+    "successBorder": "#9ecdb5",
+    "warning": "#71430a",
+    "warningSurface": "#fff6df",
+    "warningBorder": "#dfc27c",
+    "focus": "#7a2b33",
+    "focusHalo": "rgba(122, 43, 51, 0.22)"
+  },
+  "typography": {
+    "familyJapanese": "\"Noto Sans JP\", \"Hiragino Sans\", \"Yu Gothic UI\", sans-serif",
+    "weightMedium": 500,
+    "weightSemibold": 650,
+    "weightBold": 700,
+    "weightDisplay": 800,
+    "sizeSmall": "0.875rem",
+    "sizeBody": "1rem",
+    "sizeLead": "1.0625rem",
+    "sizeHeading": "1.25rem",
+    "sizeDisplay": "1.5rem",
+    "lineHeightCompact": 1.35,
+    "lineHeightBody": 1.65
+  },
+  "space": {
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem"
+  },
+  "radius": {
+    "small": "0.375rem",
+    "medium": "0.625rem",
+    "large": "0.875rem",
+    "pill": "999px"
+  },
+  "elevation": {
+    "subtle": "0 2px 8px rgba(84, 35, 46, 0.06)",
+    "raised": "0 12px 30px rgba(84, 35, 46, 0.10)"
+  },
+  "interaction": {
+    "targetMin": "3rem",
+    "controlMin": "3rem",
+    "focusWidth": "3px",
+    "focusOffset": "2px"
+  },
+  "motion": {
+    "durationFast": "120ms",
+    "durationBase": "180ms",
+    "durationSlow": "280ms",
+    "easeStandard": "cubic-bezier(0.2, 0, 0.16, 1)"
+  }
+}

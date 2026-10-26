@@ -1,4 +1,5 @@
 import { notoSansJP, notoSansMono, notoSerifJP } from "./fonts";
+import "../design-system/design-tokens.v1.css";
 import "./globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -2,6 +2,7 @@ node_modules
 .next
 .data
 .omx
+/.verification/g006-evidence/*.png
 test-results
 playwright-report
 *.tsbuildinfo

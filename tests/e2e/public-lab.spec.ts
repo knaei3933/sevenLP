@@ -302,3 +302,48 @@ test("passes basic keyboard, label, and mobile accessibility checks", async ({ p
     }, null, 2),
   );
 });
+
+test("captures shared LP design evidence at 390, 768, and 1440 pixels", async ({ page }) => {
+  test.skip(test.info().project.name !== "public-anonymous", "Evidence loop controls all viewports explicitly.");
+  const widths = [390, 768, 1440] as const;
+  const evidence: Record<string, unknown>[] = [];
+  const artifactDir = join(process.cwd(), ".verification", "g006-evidence");
+  await mkdir(artifactDir, { recursive: true });
+
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : width === 768 ? 1024 : 900 });
+    await page.goto("/lab");
+    await page.locator("#lab-quote-draft").scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("embedded-quote-draft-form")).toBeVisible();
+
+    const metrics = await page.evaluate(() => ({
+      path: location.pathname,
+      viewport: { width: innerWidth, height: innerHeight },
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+      smallControls: [...document.querySelectorAll("a[href], button:not([disabled]), input:not([type=hidden]), select, textarea, summary")]
+        .map((element) => {
+          const target = element instanceof HTMLInputElement && (element.type === "radio" || element.type === "checkbox")
+            ? element.closest("label") ?? element
+            : element;
+          return {
+            tag: element.tagName.toLowerCase(),
+            text: element.textContent?.trim().slice(0, 80) ?? "",
+            height: target.getBoundingClientRect().height,
+          };
+        })
+        .filter((item) => item.height > 0 && item.height < 44),
+    }));
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+    expect(metrics.bodyScrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+    expect(metrics.smallControls).toEqual([]);
+    evidence.push(metrics);
+    await page.screenshot({
+      path: join(artifactDir, `public-lp-${width}.png`),
+      fullPage: true,
+    });
+  }
+
+  await writeFile(join(artifactDir, "public-lp-metrics.json"), `${JSON.stringify(evidence, null, 2)}\n`);
+});

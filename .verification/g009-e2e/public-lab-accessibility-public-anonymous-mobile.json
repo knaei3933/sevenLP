@@ -4,7 +4,7 @@
   "focus": {
     "outlineWidth": "3px",
     "outlineStyle": "solid",
-    "outlineColor": "rgb(142, 63, 69)"
+    "outlineColor": "rgb(122, 43, 51)"
   },
   "semanticAccessibility": {
     "mainCount": 1,
@@ -15,19 +15,19 @@
     "contrast": [
       {
         "text": "条件が固まっていないと依頼しにくいという課題に対して、入力できる項目から整理し、",
-        "ratio": 6.11
+        "ratio": 7.52
       },
       {
         "text": "見本用の小ロットではなく、量産前提の小容量パウチとして条件を揃えます。形状・充填",
-        "ratio": 6.48
+        "ratio": 7.97
       },
       {
         "text": "サイズ・充填量・数量などの条件は、リード情報の送信前でも自由に組み合わせて確認で",
-        "ratio": 6.11
+        "ratio": 7.52
       },
       {
         "text": "仕様と連絡先を送信して価格を確認",
-        "ratio": 5.33
+        "ratio": 5.77
       }
     ]
   },

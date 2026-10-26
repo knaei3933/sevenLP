@@ -1,34 +1,35 @@
 .shell {
-  --lp-canvas: #ffffff;
-  --lp-canvas-soft: #fdf7f6;
-  --lp-mist: #f9ece9;
-  --lp-mint: #f3d5d1;
-  --lp-brand: #a94f56;
-  --lp-brand-hover: #8e3f45;
-  --lp-brand-text: #8e3f45;
-  --lp-brand-deep: #54232e;
-  --lp-footer: #4a2129;
-  --lp-ink: #241c1e;
-  --lp-muted: #6b5a5c;
-  --lp-line: #eedbd8;
-  --lp-line-strong: #dcc0bc;
-  --lp-rule: #f5e6e4;
-  --lp-danger: #b3261e;
-  --lp-danger-bg: #fff3f2;
-  --lp-danger-border: #e7b8b3;
-  --lp-warning-text: #7a4e00;
-  --lp-warning-bg: #fff8e6;
-  --lp-warning-border: #e7d4a2;
-  --lp-focus: #8e3f45;
-  --lp-radius-xs: 2px;
-  --lp-radius-sm: 4px;
-  --lp-radius-md: 6px;
-  --lp-radius-lg: 8px;
+  /* LP aliases make the shared semantic contract the single source of truth. */
+  --lp-canvas: var(--sp-surface);
+  --lp-canvas-soft: var(--sp-canvas);
+  --lp-mist: var(--sp-canvas-soft);
+  --lp-mint: var(--sp-border);
+  --lp-brand: var(--sp-brand);
+  --lp-brand-hover: var(--sp-brand-hover);
+  --lp-brand-text: var(--sp-brand-hover);
+  --lp-brand-deep: var(--sp-brand-deep);
+  --lp-footer: var(--sp-footer);
+  --lp-ink: var(--sp-ink);
+  --lp-muted: var(--sp-ink-muted);
+  --lp-line: var(--sp-border);
+  --lp-line-strong: var(--sp-border-strong);
+  --lp-rule: var(--sp-border);
+  --lp-danger: var(--sp-danger);
+  --lp-danger-bg: var(--sp-danger-surface);
+  --lp-danger-border: var(--sp-danger-border);
+  --lp-warning-text: var(--sp-warning);
+  --lp-warning-bg: var(--sp-warning-surface);
+  --lp-warning-border: var(--sp-warning-border);
+  --lp-focus: var(--sp-focus);
+  --lp-radius-xs: calc(var(--sp-radius-small) / 2);
+  --lp-radius-sm: var(--sp-radius-small);
+  --lp-radius-md: var(--sp-radius-medium);
+  --lp-radius-lg: var(--sp-radius-large);
   --lp-border: 1px solid var(--lp-line);
   --lp-gutter: 20px;
   --lp-container: min(1200px, 100% - 40px);
-  --lp-shadow-1: 0 1px 2px rgba(84, 35, 46, .06);
-  --lp-shadow-2: 0 10px 28px rgba(84, 35, 46, .07);
+  --lp-shadow-1: var(--sp-shadow-subtle);
+  --lp-shadow-2: var(--sp-shadow-raised);
 
   overflow-x: clip;
   background: var(--lp-canvas);
@@ -715,6 +716,13 @@
 
 .formShell {
   max-width: 100%;
+  margin: 0;
+  padding: clamp(18px, 4vw, 26px);
+  border: var(--lp-border);
+  border-top: 4px solid var(--lp-brand);
+  border-radius: var(--lp-radius-large);
+  background: var(--lp-canvas);
+  box-shadow: var(--lp-shadow-raised);
 }
 
 .tabs {
@@ -832,6 +840,22 @@
   font: inherit;
   padding: 12px 13px;
   transition: border-color .18s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Guest draft state presentation: invalid fields recover visibly without
+ * depending on color alone; valid controls confirm readiness with a calm border. */
+.field input:user-invalid,
+.field select:user-invalid,
+.field textarea:user-invalid {
+  border-color: var(--lp-danger);
+  background: var(--lp-danger-bg);
+  box-shadow: inset 0 0 0 1px var(--lp-danger);
+}
+
+.field input:user-valid,
+.field select:user-valid {
+  border-color: var(--lp-line-strong);
 }
 
 .field textarea {
@@ -887,8 +911,8 @@
 }
 
 .consent input {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
   margin: 2px;
   accent-color: var(--lp-brand);
 }
@@ -917,6 +941,13 @@
   font-weight: 700;
   cursor: pointer;
   transition: background-color .18s ease;
+  transition-timing-function: var(--sp-motion-ease);
+}
+
+.submit:focus-visible {
+  outline: var(--sp-focus-width) solid var(--lp-focus);
+  outline-offset: var(--sp-focus-offset);
+  box-shadow: 0 0 0 4px var(--sp-focus-halo);
 }
 
 .submit:hover:not(:disabled) {
@@ -930,17 +961,17 @@
 
 .result {
   border: var(--lp-border);
-  border-top: 4px solid var(--lp-brand);
+  border-top: 4px solid var(--sp-success);
   border-radius: var(--lp-radius-lg);
   background: #fff;
   padding: 22px;
-  box-shadow: var(--lp-shadow-1);
+  box-shadow: var(--lp-shadow-raised);
 }
 
 .resultTitle {
   margin: 0;
   color: var(--lp-brand-deep);
-  font-size: 1.1rem;
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
 }
 
 .resultGrid {
@@ -1277,7 +1308,7 @@
 .footerNav a {
   display: inline-flex;
   align-items: center;
-  min-height: 42px;
+  min-height: var(--sp-target-min);
   color: rgba(255, 255, 255, .86);
   text-decoration: none;
 }

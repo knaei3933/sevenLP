@@ -1,0 +1,35 @@
+[
+  {
+    "path": "/lab",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "bodyScrollWidth": 390,
+    "smallControls": []
+  },
+  {
+    "path": "/lab",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "bodyScrollWidth": 768,
+    "smallControls": []
+  },
+  {
+    "path": "/lab",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "smallControls": []
+  }
+]

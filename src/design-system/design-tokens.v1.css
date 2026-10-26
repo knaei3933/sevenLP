@@ -1,0 +1,68 @@
+/*
+ * ShapePouch G006 semantic design tokens.
+ * Keep this file byte-identical in the public LP and customer portal repositories.
+ */
+:root {
+  --sp-canvas: #fdf7f6;
+  --sp-canvas-soft: #f9ece9;
+  --sp-surface: #ffffff;
+  --sp-surface-muted: #fff9f8;
+  --sp-border: #d8b7b3;
+  --sp-border-strong: #bf918d;
+  --sp-ink: #241c1e;
+  --sp-ink-muted: #5f4c4f;
+  --sp-brand: #a24a52;
+  --sp-brand-hover: #842c35;
+  --sp-brand-deep: #54232e;
+  --sp-on-brand: #ffffff;
+  --sp-footer: #4a2129;
+  --sp-danger: #a3221b;
+  --sp-danger-surface: #fff1f0;
+  --sp-danger-border: #dc9f99;
+  --sp-success: #136b43;
+  --sp-success-surface: #edf7f1;
+  --sp-success-border: #9ecdb5;
+  --sp-warning: #71430a;
+  --sp-warning-surface: #fff6df;
+  --sp-warning-border: #dfc27c;
+  --sp-focus: #7a2b33;
+  --sp-focus-halo: rgba(122, 43, 51, 0.22);
+
+  --sp-font-japanese: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --sp-weight-medium: 500;
+  --sp-weight-semibold: 650;
+  --sp-weight-bold: 700;
+  --sp-weight-display: 800;
+  --sp-text-small: 0.875rem;
+  --sp-text-body: 1rem;
+  --sp-text-lead: 1.0625rem;
+  --sp-text-heading: 1.25rem;
+  --sp-text-display: 1.5rem;
+  --sp-leading-compact: 1.35;
+  --sp-leading-body: 1.65;
+
+  --sp-space-1: 0.25rem;
+  --sp-space-2: 0.5rem;
+  --sp-space-3: 0.75rem;
+  --sp-space-4: 1rem;
+  --sp-space-5: 1.25rem;
+  --sp-space-6: 1.5rem;
+  --sp-space-8: 2rem;
+
+  --sp-radius-small: 0.375rem;
+  --sp-radius-medium: 0.625rem;
+  --sp-radius-large: 0.875rem;
+  --sp-radius-pill: 999px;
+  --sp-shadow-subtle: 0 2px 8px rgba(84, 35, 46, 0.06);
+  --sp-shadow-raised: 0 12px 30px rgba(84, 35, 46, 0.10);
+
+  --sp-target-min: 3rem;
+  --sp-control-min: 3rem;
+  --sp-focus-width: 3px;
+  --sp-focus-offset: 2px;
+
+  --sp-motion-fast: 120ms;
+  --sp-motion-base: 180ms;
+  --sp-motion-slow: 280ms;
+  --sp-motion-ease: cubic-bezier(0.2, 0, 0.16, 1);
+}
