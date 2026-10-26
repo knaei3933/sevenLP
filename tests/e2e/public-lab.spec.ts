@@ -66,8 +66,10 @@ async function semanticAccessibilityEvidence(page: Page) {
       .filter((element) => (element as HTMLElement).offsetParent !== null)
       .map((element) => Number(element.tagName.charAt(1)));
     const invalidHeadingJumps = headingLevels.filter((level, index) => index > 0 && level - headingLevels[index - 1] > 1);
-    const sample = [document.body, document.querySelector("h1"), document.querySelector("[class*='sectionHeading']")]
-      .filter((element): element is HTMLElement => Boolean(element));
+    const sample = [
+      ...document.querySelectorAll<HTMLElement>("[class*='sectionLead']"),
+      ...document.querySelectorAll<HTMLElement>("[class*='featureList'] span"),
+    ].slice(0, 3);
     const submit = document.querySelector<HTMLButtonElement>("button[type='submit']");
     if (submit) sample.push(submit);
 
@@ -89,10 +91,10 @@ test("keeps /lab and /lab/ anonymous and shows the Japanese public identity", as
   for (const path of ["/lab", "/lab/"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/lab\/?$/);
-    await expect(page.getByRole("heading", { level: 1, name: "パウチ充填ラボ" })).toBeVisible();
-    await expect(page.getByText("Epackage Labのパウチ充填専門サービス")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "ご検討の進め方" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "選ばれる理由" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "小容量パウチを、1万枚から仕様入力だけで進める。" })).toBeVisible();
+    await expect(page.getByText("Epackage Labのパウチ充填専門サービス").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "仕様の見極めから納品条件まで" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "充填条件を確定しやすくする体制" })).toBeVisible();
     const contact = page.getByRole("link", { name: "shapepouch@package-lab.com" });
     await expect(contact).toBeVisible();
     await expect(contact).toHaveAttribute("href", /mailto:shapepouch@package-lab\.com/);
@@ -108,7 +110,7 @@ test("releases a quotation only after a valid lead submission", async ({ page },
   await page.goto("/lab");
 
   await expect(page.getByLabel("サイズ")).toHaveValue("round-50x60");
-  await expect(page.getByTestId("pre-gate-price-notice")).toContainText("最終価格は");
+  await expect(page.getByTestId("pre-gate-price-notice")).toContainText("単価・総額は");
   await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
   await expect(page.locator("#lab-quote")).not.toContainText("¥");
 
@@ -119,7 +121,7 @@ test("releases a quotation only after a valid lead submission", async ({ page },
   await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
 
   await page.getByTestId("lab-size").selectOption("round-60x100");
-  await page.getByTestId("lab-quantity").fill("1000");
+  await page.getByTestId("lab-quantity").fill("10000");
   await page.getByTestId("lab-fill").fill("2.5");
   await page.getByTestId("lab-chambers").selectOption("2");
   await page.getByTestId("lab-filling-method").selectOption("hopper");
@@ -142,7 +144,7 @@ test("releases a quotation only after a valid lead submission", async ({ page },
   await expect(page.getByTestId("quote-reference")).toHaveText(quote.reference);
   await expect(page.getByTestId("released-grand-total")).toHaveText(`¥${quote.grandTotal}`);
   await expect(page.getByTestId("lab-submit")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "お見積りが発行されました" })).toBeFocused();
+  await expect(page.getByRole("heading", { name: "お見積り条件を確認しました" })).toBeFocused();
 });
 
 test("accepts an anonymous consultation without releasing a quote", async ({ page }, testInfo) => {
@@ -183,9 +185,16 @@ test("redirects protected internal pages to login", async ({ page }) => {
 
 test("passes basic keyboard, label, and mobile accessibility checks", async ({ page }, testInfo) => {
   await page.goto("/lab");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab"); // skip link
+  await page.keyboard.press("Tab"); // header: products
+  await page.keyboard.press("Tab"); // header: estimate
+  await page.keyboard.press("Tab"); // header: quality
+  await page.keyboard.press("Tab"); // header: process
+  await page.keyboard.press("Tab"); // header: contact
+  await page.keyboard.press("Tab"); // primary estimate action
+  await page.keyboard.press("Tab"); // consultation action
+  await page.keyboard.press("Tab"); // product specification link
+  await page.keyboard.press("Tab"); // request-type tabs
   await expect(page.getByRole("tab", { name: "お見積もり" })).toBeFocused();
 
   const focusStyle = await page.getByRole("tab", { name: "お見積もり" }).evaluate((element) => {

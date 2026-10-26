@@ -66,11 +66,11 @@ describe("public lab request form", () => {
   it("shows the configured specification without a pre-gate price", () => {
     renderForm();
 
-    expect(screen.getByRole("group", { name: "現在のご依頼条件" })).toHaveTextContent(
+    expect(screen.getByRole("group", { name: "現在の入力仕様" })).toHaveTextContent(
       "ラウンド 50×60",
     );
     expect(screen.getByTestId("pre-gate-price-notice")).toHaveTextContent(
-      "最終価格は、リード情報の送信完了後に表示します。",
+      "単価・総額は、会社情報と連絡先、同意の確認後に表示します。",
     );
     expect(document.querySelector("#lab-quote-result-heading")).toBeNull();
     expect(screen.queryByText(/¥/)).not.toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("public lab request form", () => {
     const fetchMock = mockFetchOnce({ quote: apiQuote });
     await fillValidLead(user);
 
-    await user.click(screen.getByRole("button", { name: "リード情報を送信して価格を確認する" }));
+    await user.click(screen.getByRole("button", { name: "仕様と連絡先を送信して価格を確認" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent("入力内容をご確認ください。");
@@ -94,15 +94,15 @@ describe("public lab request form", () => {
     const fetchMock = mockFetchOnce(apiQuote);
     await fillValidLead(user);
     await user.click(screen.getByLabelText(/プライバシーポリシーに同意し/));
-    await user.click(screen.getByRole("button", { name: "リード情報を送信して価格を確認する" }));
+    await user.click(screen.getByRole("button", { name: "仕様と連絡先を送信して価格を確認" }));
 
     expect(fetchMock).toHaveBeenCalledWith("/api/public/lab/requests", expect.any(Object));
-    expect(screen.getByRole("heading", { name: "お見積りが発行されました" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "お見積り条件を確認しました" })).toBeInTheDocument();
     expect(screen.getByTestId("quote-reference")).toHaveTextContent("PL-TEST-REFERENCE");
     expect(screen.getByTestId("released-grand-total")).toHaveTextContent("¥33000");
     expect(screen.queryByText("lead@example.com")).not.toBeInTheDocument();
     expect(screen.queryByText("テスト株式会社")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "リード情報を送信して価格を確認する" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "仕様と連絡先を送信して価格を確認" })).not.toBeInTheDocument();
   });
 
   it("renders only the safe confirmation for consultation and sample requests", async () => {
@@ -115,7 +115,7 @@ describe("public lab request form", () => {
     await user.click(screen.getByRole("tab", { name: "ご相談" }));
     await fillValidLead(user);
     await user.click(screen.getByLabelText(/プライバシーポリシーに同意し/));
-    await user.click(screen.getByRole("button", { name: "送信する" }));
+    await user.click(screen.getByTestId("lab-submit"));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("heading", { name: "受け付けました。担当からご連絡いたします。" })).toBeInTheDocument();
@@ -132,10 +132,52 @@ describe("public lab request form", () => {
     await fillValidLead(user);
     await user.type(screen.getByLabelText("メールアドレス"), "invalid");
     await user.click(screen.getByLabelText(/プライバシーポリシーに同意し/));
-    await user.click(screen.getByRole("button", { name: "リード情報を送信して価格を確認する" }));
+    await user.click(screen.getByRole("button", { name: "仕様と連絡先を送信して価格を確認" }));
 
     expect(screen.getByLabelText("メールアドレス")).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByLabelText("メールアドレス")).toHaveAttribute("aria-describedby", "lab-email-error");
     expect(screen.getByText("メールアドレスの形式を確認してください。")).toBeInTheDocument();
+  });
+
+  it("applies XRA's one-gram capacity rule", async () => {
+    const user = renderForm();
+
+    await user.selectOptions(screen.getByTestId("lab-size"), "xra-38.5x90");
+
+    expect(screen.getByTestId("lab-size-rule")).toHaveTextContent(
+      "スリムドーズ 38.5×90（XRA）: 1g／10,000枚〜",
+    );
+    expect(screen.getByTestId("lab-fill")).toHaveAttribute("min", "1");
+    expect(screen.getByTestId("lab-fill")).toHaveAttribute("max", "1");
+
+    await fillValidLead(user);
+    await user.clear(screen.getByTestId("lab-quantity"));
+    await user.type(screen.getByTestId("lab-quantity"), "10000");
+    await user.clear(screen.getByTestId("lab-fill"));
+    await user.type(screen.getByTestId("lab-fill"), "2");
+    await user.click(screen.getByLabelText(/プライバシーポリシーに同意し/));
+    await user.click(screen.getByTestId("lab-submit"));
+
+    expect(screen.getByText("充填量は1gで入力してください。")).toBeInTheDocument();
+  });
+
+  it("applies SPA's fifty-thousand minimum quantity rule", async () => {
+    const user = renderForm();
+
+    await user.selectOptions(screen.getByTestId("lab-size"), "spa-35x80");
+
+    expect(screen.getByTestId("lab-size-rule")).toHaveTextContent(
+      "スポイトボトル型 35×80: 1g／50,000枚〜",
+    );
+    expect(screen.getByTestId("lab-quantity")).toHaveAttribute("min", "50000");
+
+    await fillValidLead(user);
+    await user.clear(screen.getByTestId("lab-quantity"));
+    await user.type(screen.getByTestId("lab-quantity"), "49999");
+    await user.type(screen.getByTestId("lab-fill"), "1");
+    await user.click(screen.getByLabelText(/プライバシーポリシーに同意し/));
+    await user.click(screen.getByTestId("lab-submit"));
+
+    expect(screen.getByText("数量は50,000枚以上の整数で入力してください。上限は設定していません。")).toBeInTheDocument();
   });
 });

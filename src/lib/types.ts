@@ -17,6 +17,7 @@ export type SizeKey =
   | "bottle-35x80"
   | "bottle-50x90"
   | "bottle-70x120"
+  | "spa-35x80"
   | "xra-38.5x90"
   | "mouthwash-45x145";
 

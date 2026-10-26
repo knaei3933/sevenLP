@@ -10,6 +10,7 @@ import {
   publicLabPrintingMethodOptions,
   publicLabSizeOptions,
 } from "@/lib/public-lab-options";
+import { getPublicLabSizeRule } from "@/lib/public-lab-rules";
 
 const lead = {
   company: "  株式会社サンプル  ",
@@ -27,8 +28,8 @@ function quotationInput(overrides: Record<string, unknown> = {}) {
     requestType: "quotation",
     ...lead,
     sizeKey: "round-50x60",
-    quantity: 500,
-    fillMlPerChamber: 0.5,
+    quantity: 10_000,
+    fillMlPerChamber: 1,
     connectedChambers: 1,
     fillingMethod: "hopper",
     printingMethod: "digital",
@@ -66,8 +67,8 @@ describe("validatePublicLabRequest", () => {
         email: "tanaka@example.co.jp",
         phone: "03-1234-5678",
         sizeKey: "round-50x60",
-        quantity: 500,
-        fillMlPerChamber: 0.5,
+        quantity: 10_000,
+        fillMlPerChamber: 1,
         connectedChambers: 1,
         fillingMethod: "hopper",
         printingMethod: "digital",
@@ -80,8 +81,8 @@ describe("validatePublicLabRequest", () => {
 
     const gravure = validatePublicLabRequest(quotationInput({
       sizeKey: "tube-70x120",
-      quantity: 1_000_000,
-      fillMlPerChamber: 20,
+      quantity: 1_000_001,
+      fillMlPerChamber: 10,
       connectedChambers: 4,
       fillingMethod: "pressure",
       printingMethod: "gravure",
@@ -183,11 +184,10 @@ describe("validatePublicLabRequest", () => {
 
   it("enforces exact quotation technical ranges and closed enum values", () => {
     expectFailure(quotationInput({ sizeKey: "custom-100x100" }), ["sizeKey:invalidValue"]);
-    expectFailure(quotationInput({ quantity: 499 }), ["quantity:outOfRange"]);
-    expectFailure(quotationInput({ quantity: 1_000_001 }), ["quantity:outOfRange"]);
+    expectFailure(quotationInput({ quantity: 9_999 }), ["quantity:outOfRange"]);
     expectFailure(quotationInput({ quantity: 500.5 }), ["quantity:invalidInteger"]);
-    expectFailure(quotationInput({ fillMlPerChamber: 0.49 }), ["fillMlPerChamber:outOfRange"]);
-    expectFailure(quotationInput({ fillMlPerChamber: 20.01 }), ["fillMlPerChamber:outOfRange"]);
+    expectFailure(quotationInput({ fillMlPerChamber: 0.99 }), ["fillMlPerChamber:outOfRange"]);
+    expectFailure(quotationInput({ fillMlPerChamber: 10.01 }), ["fillMlPerChamber:outOfRange"]);
     expectFailure(quotationInput({ fillMlPerChamber: 1.234 }), ["fillMlPerChamber:tooManyDecimalPlaces"]);
     expectFailure(quotationInput({ connectedChambers: 0 }), ["connectedChambers:outOfRange"]);
     expectFailure(quotationInput({ connectedChambers: 5 }), ["connectedChambers:outOfRange"]);
@@ -201,8 +201,8 @@ describe("validatePublicLabRequest", () => {
   it("rejects every technical field on consultation and sample requests", () => {
     const technical = {
       sizeKey: "round-50x60",
-      quantity: 500,
-      fillMlPerChamber: 0.5,
+      quantity: 10_000,
+      fillMlPerChamber: 1,
       connectedChambers: 1,
       fillingMethod: "hopper",
       printingMethod: "digital",
@@ -238,13 +238,48 @@ describe("validatePublicLabRequest", () => {
     expectFailure(quotationInput({ message: "x".repeat(2_001) }), ["message:tooLong"]);
   });
 
-  it("exposes exactly 19 standard sizes and public enum options", () => {
-    expect(publicLabSizeOptions).toHaveLength(19);
-    expect(new Set(publicLabSizeOptions.map((option) => option.key)).size).toBe(19);
+  it("enforces shape-specific capacity and minimum quantity rules", () => {
+    expectFailure(quotationInput({
+      sizeKey: "spa-35x80",
+      quantity: 49_999,
+    }), ["quantity:outOfRange"]);
+    expect(validatePublicLabRequest(quotationInput({
+      sizeKey: "spa-35x80",
+      quantity: 50_000,
+      fillMlPerChamber: 1,
+    })).success).toBe(true);
+
+    expectFailure(quotationInput({
+      sizeKey: "xra-38.5x90",
+      fillMlPerChamber: 2,
+    }), ["fillMlPerChamber:outOfRange"]);
+    expect(validatePublicLabRequest(quotationInput({
+      sizeKey: "xra-38.5x90",
+      fillMlPerChamber: 1,
+    })).success).toBe(true);
+
+    expectFailure(quotationInput({
+      sizeKey: "circle-70x70",
+      fillMlPerChamber: 3,
+    }), ["fillMlPerChamber:outOfRange"]);
+    expect(validatePublicLabRequest(quotationInput({
+      sizeKey: "circle-70x70",
+      fillMlPerChamber: 2,
+    })).success).toBe(true);
+  });
+
+  it("exposes exactly 20 standard sizes and public enum options", () => {
+    expect(publicLabSizeOptions).toHaveLength(20);
+    expect(new Set(publicLabSizeOptions.map((option) => option.key)).size).toBe(20);
     expect(publicLabFillingMethodOptions.map((option) => option.value)).toEqual(["hopper", "pressure"]);
     expect(publicLabPrintingMethodOptions.map((option) => option.value)).toEqual(["digital", "gravure"]);
     for (const option of publicLabSizeOptions) {
-      expect(validatePublicLabRequest(quotationInput({ sizeKey: option.key })).success).toBe(true);
+      const rule = getPublicLabSizeRule(option.key);
+      expect(validatePublicLabRequest(quotationInput({
+        sizeKey: option.key,
+        quantity: rule.minimumQuantity,
+        fillMlPerChamber: rule.capacity.min,
+      })).success).toBe(true);
     }
     const validRequests: PublicLabRequest[] = [];
     for (const option of publicLabPrintingMethodOptions) {

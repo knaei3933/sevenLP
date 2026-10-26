@@ -1,4 +1,5 @@
 import { publicLabSizeOptions } from "./public-lab-options";
+import { getPublicLabSizeRule } from "./public-lab-rules";
 import type {
   PublicLabFillingMethod,
   PublicLabPrintingMethod,
@@ -308,13 +309,17 @@ function validateQuotationTechnicalFields(
   input: Record<string, unknown>,
   errors: PublicLabFieldError[],
 ): void {
+  const sizeRule = typeof input.sizeKey === "string"
+    ? getPublicLabSizeRule(input.sizeKey)
+    : getPublicLabSizeRule("round-50x60");
+
   if (typeof input.sizeKey !== "string" || !isPublicLabSizeKey(input.sizeKey)) {
     errors.push({ field: "sizeKey", code: "invalidValue" });
   }
 
   if (typeof input.quantity !== "number" || !Number.isInteger(input.quantity)) {
     errors.push({ field: "quantity", code: "invalidInteger" });
-  } else if (input.quantity < 500 || input.quantity > 1_000_000) {
+  } else if (input.quantity < sizeRule.minimumQuantity) {
     errors.push({ field: "quantity", code: "outOfRange" });
   }
 
@@ -322,7 +327,10 @@ function validateQuotationTechnicalFields(
     errors.push({ field: "fillMlPerChamber", code: "invalidType" });
   } else if (!hasAtMostTwoFractionDigits(input.fillMlPerChamber)) {
     errors.push({ field: "fillMlPerChamber", code: "tooManyDecimalPlaces" });
-  } else if (input.fillMlPerChamber < 0.5 || input.fillMlPerChamber > 20) {
+  } else if (
+    input.fillMlPerChamber < sizeRule.capacity.min
+    || input.fillMlPerChamber > sizeRule.capacity.max
+  ) {
     errors.push({ field: "fillMlPerChamber", code: "outOfRange" });
   }
 

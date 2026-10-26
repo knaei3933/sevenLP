@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pouch Filling Lab">
+  <rect width="64" height="64" rx="8" fill="#54232e"/>
+  <path d="M20 15h24l7 13v20a5 5 0 0 1-5 5H18a5 5 0 0 1-5-5V28z" fill="#f3d5d1"/>
+  <path d="M20 15h24l7 13H13z" fill="#f9ece9"/>
+  <path d="M25 35h14v9a4 4 0 0 1-4 4H29a4 4 0 0 1-4-4z" fill="#a94f56" opacity=".82"/>
+</svg>

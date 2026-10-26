@@ -2,7 +2,6 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { createElement } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it } from "vitest";
@@ -87,7 +86,7 @@ describe("public lab v1 negative boundaries", () => {
       ...listFiles("src/lib"),
       ...listFiles("src/app/api"),
       ...listFiles("src/app/lab"),
-    ];
+    ].filter((path) => /\.(?:ts|tsx|js|jsx|mjs|cjs|css|svg)$/.test(path));
 
     expect(sourceFiles.length).toBeGreaterThan(20);
     for (const path of sourceFiles) {
@@ -155,8 +154,8 @@ describe("public lab v1 negative boundaries", () => {
     }
   });
 
-  it("renders the approved public contact as a valid mailto link", () => {
-    render(createElement(LabPage));
+  it("renders the approved public contact as a valid mailto link", async () => {
+    render(await LabPage({ searchParams: Promise.resolve({}) }));
 
     const contact = screen.getByRole("link", { name: PUBLIC_CONTACT });
     expect(contact).toBeVisible();

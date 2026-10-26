@@ -1,0 +1,24 @@
+[Unit]
+Description=ShapePouch public LP
+After=network.target
+
+[Service]
+Type=simple
+User=shapepouch
+Group=shapepouch
+WorkingDirectory=/opt/shapepouch
+Environment=NODE_ENV=production
+Environment=NEXT_PUBLIC_SITE_URL=https://lab.example.com
+Environment=POUCH_PUBLIC_LEAD_DB=/var/lib/shapepouch/public-leads.db
+ExecStart=/usr/bin/npm run start -- -H 127.0.0.1 -p 3000
+Restart=on-failure
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/shapepouch
+
+[Install]
+WantedBy=multi-user.target

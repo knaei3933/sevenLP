@@ -32,7 +32,8 @@ export const publicLabSizeOptions = [
   { key: "bottle-35x80", label: "ボトル型 35×80" },
   { key: "bottle-50x90", label: "ボトル型 50×90" },
   { key: "bottle-70x120", label: "ボトル型 70×120" },
-  { key: "xra-38.5x90", label: "Xraラウンド 38.5×90" },
+  { key: "spa-35x80", label: "スポイトボトル型 35×80" },
+  { key: "xra-38.5x90", label: "スリムドーズ 38.5×90（XRA）" },
   { key: "mouthwash-45x145", label: "マウスウォッシュ用 45×145" },
 ] as const satisfies readonly PublicLabSizeOption[];
 

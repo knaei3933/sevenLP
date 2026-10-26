@@ -12,6 +12,7 @@ import {
   type PublicLabPrintingMethod,
   type PublicLabRequestType,
 } from "@/lib/public-lab-options";
+import { getPublicLabSizeRule, type PublicLabShapeRule } from "@/lib/public-lab-rules";
 
 import styles from "./page.module.css";
 
@@ -58,7 +59,7 @@ type TechnicalForm = {
 
 const initialTechnical: TechnicalForm = {
   sizeKey: publicLabSizeOptions[0].key,
-  quantity: "1000",
+  quantity: "10000",
   fillMlPerChamber: "1",
   connectedChambers: "1",
   fillingMethod: publicLabFillingMethodOptions[0].value,
@@ -108,6 +109,12 @@ function isApiConfirmation(value: unknown): value is ApiConfirmation {
     && typeof (value as { reference?: unknown }).reference === "string";
 }
 
+function formatCapacityRange(rule: PublicLabShapeRule): string {
+  return rule.capacity.min === rule.capacity.max
+    ? `${rule.capacity.min}${rule.unit}`
+    : `${rule.capacity.min}〜${rule.capacity.max}${rule.unit}`;
+}
+
 function formatDateTime(isoDate: string): string {
   const date = new Date(isoDate);
   return Number.isNaN(date.getTime())
@@ -115,8 +122,12 @@ function formatDateTime(isoDate: string): string {
     : date.toLocaleString("ja-JP", { dateStyle: "medium", timeStyle: "short" });
 }
 
-export function LabRequestForm() {
-  const [requestType, setRequestType] = useState<PublicLabRequestType>("quotation");
+export function LabRequestForm({
+  initialRequestType = "quotation",
+}: {
+  initialRequestType?: PublicLabRequestType;
+} = {}) {
+  const [requestType, setRequestType] = useState<PublicLabRequestType>(initialRequestType);
   const [company, setCompany] = useState("");
   const [contactName, setContactName] = useState("");
   const [email, setEmail] = useState("");
@@ -141,6 +152,7 @@ export function LabRequestForm() {
   const chambers = Number(technical.connectedChambers);
   const colorCount = Number(technical.colorCount);
   const sizeLabel = publicLabSizeOptions.find((option) => option.key === technical.sizeKey)?.label ?? "";
+  const sizeRule = getPublicLabSizeRule(technical.sizeKey);
   const fillingLabel = publicLabFillingMethodOptions.find((option) => option.value === technical.fillingMethod)?.label ?? "";
   const printingLabel = publicLabPrintingMethodOptions.find((option) => option.value === technical.printingMethod)?.label ?? "";
 
@@ -184,11 +196,11 @@ export function LabRequestForm() {
       errors.email = "メールアドレスの形式を確認してください。";
     }
     if (requestType === "quotation") {
-      if (!Number.isInteger(quantity) || quantity < 500 || quantity > 1_000_000) {
-        errors.quantity = "数量は500〜1,000,000枚の整数で入力してください。";
+      if (!Number.isInteger(quantity) || quantity < sizeRule.minimumQuantity) {
+        errors.quantity = `数量は${sizeRule.minimumQuantity.toLocaleString("ja-JP")}枚以上の整数で入力してください。上限は設定していません。`;
       }
-      if (!Number.isFinite(fillMl) || fillMl < 0.5 || fillMl > 20) {
-        errors.fillMlPerChamber = "充填量は0.5〜20mLで入力してください。";
+      if (!Number.isFinite(fillMl) || fillMl < sizeRule.capacity.min || fillMl > sizeRule.capacity.max) {
+        errors.fillMlPerChamber = `充填量は${formatCapacityRange(sizeRule)}で入力してください。`;
       }
       if (!Number.isInteger(chambers) || chambers < 1 || chambers > 4) {
         errors.connectedChambers = "チャンバー数は1〜4で選択してください。";
@@ -294,7 +306,7 @@ export function LabRequestForm() {
           id="lab-quote-result-heading"
           ref={quoteResultHeadingRef}
           tabIndex={-1}
-        >お見積りが発行されました</h3>
+        >お見積り条件を確認しました</h3>
         <dl className={styles.resultGrid}>
           <div><dt>参照番号</dt><dd data-testid="quote-reference">{result.reference}</dd></div>
           <div><dt>発行日時</dt><dd>{formatDateTime(result.createdAt)}</dd></div>
@@ -365,19 +377,19 @@ export function LabRequestForm() {
 
         {requestType === "quotation" && (
           <>
-            <div className={styles.configuration} role="group" aria-label="現在のご依頼条件">
-              <h3 className={styles.configTitle}>現在のご依頼条件</h3>
+            <div className={styles.configuration} role="group" aria-label="現在の入力仕様">
+          <h3 className={styles.configTitle}>現在の入力仕様</h3>
               <dl className={styles.configurationGrid}>
                 <div><dt>サイズ</dt><dd>{sizeLabel}</dd></div>
                 <div><dt>数量</dt><dd>{quantity.toLocaleString("ja-JP")}枚</dd></div>
-                <div><dt>充填量</dt><dd>{fillMl}mL</dd></div>
+                <div><dt>充填量</dt><dd>{fillMl}{sizeRule.unit}</dd></div>
                 <div><dt>チャンバー数</dt><dd>{chambers}室</dd></div>
                 <div><dt>充填方法</dt><dd>{fillingLabel}</dd></div>
                 <div><dt>印刷方法</dt><dd>{printingLabel}</dd></div>
                 <div><dt>色数</dt><dd>{colorCount}色</dd></div>
               </dl>
               <p className={styles.priceNotice} data-testid="pre-gate-price-notice">
-                最終価格は、リード情報の送信完了後に表示します。
+                単価・総額は、会社情報と連絡先、同意の確認後に表示します。
               </p>
             </div>
 
@@ -401,8 +413,7 @@ export function LabRequestForm() {
                 data-testid="lab-quantity"
                 type="number"
                 inputMode="numeric"
-                min={500}
-                max={1_000_000}
+                min={sizeRule.minimumQuantity}
                 step={1}
                 value={technical.quantity}
                 onChange={(event) => setTechnical((current) => ({ ...current, quantity: event.target.value }))}
@@ -411,20 +422,23 @@ export function LabRequestForm() {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="lab-fillMlPerChamber">充填量（1室あたり/mL）</label>
+              <label htmlFor="lab-fillMlPerChamber">充填量（1室あたり/{sizeRule.unit}）</label>
               <input
                 {...fieldErrorProps("fillMlPerChamber")}
                 data-testid="lab-fill"
                 type="number"
                 inputMode="decimal"
-                min={0.5}
-                max={20}
+                min={sizeRule.capacity.min}
+                max={sizeRule.capacity.max}
                 step={0.01}
                 value={technical.fillMlPerChamber}
                 onChange={(event) => setTechnical((current) => ({ ...current, fillMlPerChamber: event.target.value }))}
               />
               {errorText("fillMlPerChamber")}
             </div>
+            <p className={styles.formHint} data-testid="lab-size-rule">
+              {sizeLabel}: {formatCapacityRange(sizeRule)}／{sizeRule.minimumQuantity.toLocaleString("ja-JP")}枚〜
+            </p>
 
             <div className={styles.field}>
               <label htmlFor="lab-connectedChambers">チャンバー数</label>
@@ -491,7 +505,7 @@ export function LabRequestForm() {
               {errorText("colorCount")}
             </div>
 
-            <p className={styles.bulkNote}>バルク（中身）: お客様支給</p>
+            <p className={styles.bulkNote}>バルク（内容物）：お客様支給を前提とします。</p>
           </>
         )}
 
@@ -599,7 +613,7 @@ export function LabRequestForm() {
         </div>
 
         <button className={styles.submit} data-testid="lab-submit" type="submit" disabled={pending}>
-          {pending ? "送信中です" : requestType === "quotation" ? "リード情報を送信して価格を確認する" : "送信する"}
+          {pending ? "送信中です" : requestType === "quotation" ? "仕様と連絡先を送信して価格を確認" : requestType === "consultation" ? "相談内容を送信する" : "サンプル依頼を送信する"}
         </button>
         <p className={styles.formNote}>依頼種別: {selectedTypeLabel}</p>
       </form>

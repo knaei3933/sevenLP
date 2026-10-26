@@ -1,6 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = new Set(["/login", "/lab", "/lab/"]);
+const PUBLIC_PATHS = new Set([
+  "/login",
+  "/lab",
+  "/lab/",
+  "/robots.txt",
+  "/sitemap.xml",
+]);
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

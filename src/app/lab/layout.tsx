@@ -1,9 +1,35 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
 
+const title = "パウチ充填ラボ | Epackage Lab";
+const description = "化粧品・トイレタリー向けの小容量パウチ充填サービス。ラウンド・ボトル・チューブなど6形状を最短10,000枚から製造し、無料見積もりやサンプル依頼を日本語で進められます。";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "パウチ充填ラボ | Epackage Lab",
-  description: "Epackage Labのパウチ充填専門サービス。小ロットのパウチ充填・サンプル・ご相談を受け付けています。",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    title,
+    description,
+    siteName: "パウチ充填ラボ",
+    images: [
+      {
+        url: "/lab/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "パウチ充填ラボのサービス紹介画像",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/lab/opengraph-image.png"],
+  },
 };
 
 export default function LabLayout({ children }: { children: React.ReactNode }) {

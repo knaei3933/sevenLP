@@ -295,8 +295,15 @@ describe("POST /api/public/lab/requests", () => {
     const unknownPayload = await jsonOf(unknownResponse);
     const invalidResponse = await POST(publicRequest(JSON.stringify({
       ...quotationBase,
-      quantity: 499,
+      quantity: 9_999,
     })));
+    const spaMinimumResponse = await POST(publicRequest(JSON.stringify({
+      ...quotationBase,
+      sizeKey: "spa-35x80",
+      quantity: 49_999,
+      fillMlPerChamber: 1,
+    })));
+    const spaMinimumPayload = await jsonOf(spaMinimumResponse);
     const invalidPayload = await jsonOf(invalidResponse);
 
     expect(unknownResponse.status).toBe(400);
@@ -308,7 +315,11 @@ describe("POST /api/public/lab/requests", () => {
     expect(invalidPayload).toEqual({
       errors: [{ field: "quantity", code: "outOfRange" }],
     });
-    expect(JSON.stringify(invalidPayload)).not.toContain("499");
+    expect(spaMinimumResponse.status).toBe(400);
+    expect(spaMinimumPayload).toEqual({
+      errors: [{ field: "quantity", code: "outOfRange" }],
+    });
+    expect(JSON.stringify(invalidPayload)).not.toContain("9999");
     expect(await countPublicLeads()).toBe(0);
   });
 
