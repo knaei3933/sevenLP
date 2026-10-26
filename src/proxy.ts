@@ -11,6 +11,11 @@ const PUBLIC_PATHS = new Set([
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  // The public LP is canonical at `/`; `/lab` remains a compatible alias.
+  if (pathname === "/" || pathname === "") {
+    return NextResponse.rewrite(new URL("/lab", request.url));
+  }
+
   if (PUBLIC_PATHS.has(pathname)) {
     return NextResponse.next();
   }

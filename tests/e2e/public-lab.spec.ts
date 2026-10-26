@@ -87,10 +87,10 @@ async function semanticAccessibilityEvidence(page: Page) {
   });
 }
 
-test("keeps /lab and /lab/ anonymous and shows the Japanese public identity", async ({ page }) => {
-  for (const path of ["/lab", "/lab/"]) {
+test("keeps /, /lab, and /lab/ anonymous and shows the Japanese public identity", async ({ page }) => {
+  for (const path of ["/", "/lab", "/lab/"]) {
     await page.goto(path);
-    await expect(page).toHaveURL(/\/lab\/?$/);
+    await expect(page).toHaveURL(/^(?:.*\/|.*\/lab\/?)$/);
     await expect(page.getByRole("heading", { level: 1, name: "小容量パウチを、1万枚から仕様入力だけで進める。" })).toBeVisible();
     await expect(page.getByText("Epackage Labのパウチ充填専門サービス").first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "仕様の見極めから納品条件まで" })).toBeVisible();
