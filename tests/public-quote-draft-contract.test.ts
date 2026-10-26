@@ -72,7 +72,8 @@ describe("signed guest quote draft contract", () => {
     });
     const payload = payloadFrom(issued.token);
 
-    expect(Object.keys(payload).sort()).toEqual([
+    const keys = Object.keys(payload).sort();
+    expect(keys).toEqual([
       "colorCount",
       "designId",
       "expiresAt",
@@ -83,6 +84,7 @@ describe("signed guest quote draft contract", () => {
       "quantity",
       "sizeKey",
     ]);
+    expect(keys).not.toContain("printingMethod");
     expect(payload).toEqual({
       colorCount: 2,
       designId: "rda",

@@ -38,6 +38,7 @@ describe("embedded G004 quote draft form", () => {
     );
     expect(source).toContain("/api/public/lab/quote-drafts");
     expect(source).not.toMatch(/fetch\s*\(/);
+    expect(source).not.toMatch(/printingMethod/);
     expect(source).not.toMatch(/\/api\/public\/lab\/requests|\/api\/calculate/);
     expect(source).not.toMatch(/POUCH_QUOTE_DRAFT_SIGNING_KEY|node:crypto/);
   });
