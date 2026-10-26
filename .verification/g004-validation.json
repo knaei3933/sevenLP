@@ -1,0 +1,133 @@
+{
+  "goal": "G004",
+  "scopeBoundary": "Issuance and contract only; portal resume (G005) and visual redesign (G006) not implemented.",
+  "route": {
+    "method": "POST",
+    "path": "/api/public/lab/quote-drafts",
+    "contentType": "application/x-www-form-urlencoded",
+    "requestFields": [
+      "designId",
+      "sizeKey",
+      "fillAmount",
+      "colorCount",
+      "quantity",
+      "locale"
+    ],
+    "customerInputFields": [
+      "designId",
+      "sizeKey",
+      "fillAmount",
+      "colorCount",
+      "quantity"
+    ],
+    "success": "303 Location /quote#quoteDraft=<signed-token>; no query parameters",
+    "failureCodes": [
+      "unsupported_media_type",
+      "invalid_origin",
+      "request_too_large",
+      "rate_limited",
+      "invalid_request",
+      "quote_draft_unavailable",
+      "method_not_allowed"
+    ],
+    "sameOrigin": "POUCH_QUOTE_DRAFT_ALLOWED_ORIGINS exact URL allowlist plus Origin host equality",
+    "bodyLimitBytes": 2048,
+    "token": {
+      "algorithm": "HMAC-SHA256 via node:crypto",
+      "format": "public-quote-draft.v1.<base64url-canonical-json>.<base64url-signature>",
+      "canonicalKeys": [
+        "colorCount",
+        "designId",
+        "expiresAt",
+        "fillAmount",
+        "issuedAt",
+        "locale",
+        "nonce",
+        "quantity",
+        "sizeKey"
+      ],
+      "nonceBits": 128,
+      "maxAgeSeconds": 3600,
+      "maxEncodedBytes": 2048,
+      "envKey": "POUCH_QUOTE_DRAFT_SIGNING_KEY"
+    }
+  },
+  "rateLimit": {
+    "database": "POUCH_PUBLIC_LEAD_DB",
+    "table": "public_quote_draft_rate_limits",
+    "columns": [
+      "bucket_hash",
+      "request_count",
+      "window_started_at",
+      "expires_at"
+    ],
+    "limit": "10 requests/hour/bucket",
+    "expiry": "1 hour",
+    "cleanup": "Deletes records expired more than 24 hours",
+    "privacy": "Only keyed SHA-256 client bucket hash and timing/count metadata are persisted; raw IP, email, payload, and signature are never stored."
+  },
+  "persistenceAudit": {
+    "publicLeadsForDraftSubmit": 0,
+    "publicQuotationsForDraftSubmit": 0,
+    "draftOnlyDurableWrites": "public_quote_draft_rate_limits",
+    "evidenceTests": [
+      "DRAFT-006A",
+      "DRAFT-007A"
+    ]
+  },
+  "validation": [
+    {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "note": "first post-implementation invocation exposed route nullability, fixed and rerun; final exit 0"
+    },
+    {
+      "command": "npm test -- --run",
+      "exitCode": 0,
+      "counts": {
+        "files": 37,
+        "tests": 256,
+        "failed": 0
+      }
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "routeObserved": "/api/public/lab/quote-drafts"
+    },
+    {
+      "command": "npm run verify:public-lab-client",
+      "exitCode": 0,
+      "counts": {
+        "productionLabAssets": 10
+      }
+    },
+    {
+      "command": "g004 bundle secret scan (inline Node, recorded below)",
+      "exitCode": 0,
+      "counts": {
+        "productionClientLabAssets": 62
+      },
+      "matches": 0
+    },
+    {
+      "command": "npx playwright test --project=public-anonymous --project=public-anonymous-mobile",
+      "exitCode": 0,
+      "counts": {
+        "tests": 15,
+        "passed": 15,
+        "failed": 0
+      }
+    }
+  ],
+  "evidenceFiles": [
+    ".verification/g004-bundle-secret-scan.json",
+    ".verification/public-lab-client-leak.json",
+    ".verification/g009-e2e/public-lab-accessibility-public-anonymous.json",
+    ".verification/g009-e2e/public-lab-accessibility-public-anonymous-mobile.json"
+  ]
+}

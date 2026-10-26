@@ -203,7 +203,7 @@ describe("public lead SQLite store", () => {
     );
   });
 
-  it("creates only the two public tables, required indexes, WAL, and foreign-key configuration", async () => {
+  it("creates only the public tables, required indexes, WAL, and foreign-key configuration", async () => {
     await savePublicLead(createRequest(consultationBase), { createdAt: FIXED_NOW });
     const db = await getPublicLeadDatabaseForTest();
 
@@ -214,7 +214,11 @@ describe("public lead SQLite store", () => {
     const tables = db.prepare(`
       SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name
     `).all() as Array<{ name: string }>;
-    expect(tables.map((row) => row.name)).toEqual(["public_leads", "public_quotations"]);
+    expect(tables.map((row) => row.name)).toEqual([
+      "public_leads",
+      "public_quotations",
+      "public_quote_draft_rate_limits",
+    ]);
 
     const leadColumns = db.prepare("PRAGMA table_info(public_leads)").all()
       .map((row) => (row as { name: string }).name);
@@ -228,6 +232,12 @@ describe("public lead SQLite store", () => {
     expect(quotationColumns).toEqual([
       "id", "reference", "lead_id", "canonical_request_json",
       "customer_safe_quote_json", "calculation_version", "result_hash", "created_at",
+    ]);
+
+    const rateLimitColumns = db.prepare("PRAGMA table_info(public_quote_draft_rate_limits)").all()
+      .map((row) => (row as { name: string }).name);
+    expect(rateLimitColumns).toEqual([
+      "bucket_hash", "request_count", "window_started_at", "expires_at",
     ]);
 
     const typeIndexColumns = db.prepare("PRAGMA index_info(idx_public_leads_type_created_at)")

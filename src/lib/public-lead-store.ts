@@ -1,7 +1,9 @@
-import { randomBytes } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 import { mkdir, rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+
+import { resolveQuoteDraftSigningKey } from "./public-quote-draft.server";
 
 import type {
   PublicLabConsultationRequest,
@@ -448,6 +450,15 @@ async function openAndMigrateDatabase(path: string): Promise<DatabaseSync> {
     );
     CREATE INDEX IF NOT EXISTS idx_public_quotations_lead_id
       ON public_quotations(lead_id);
+
+    CREATE TABLE IF NOT EXISTS public_quote_draft_rate_limits (
+      bucket_hash TEXT PRIMARY KEY,
+      request_count INTEGER NOT NULL CHECK (request_count >= 1),
+      window_started_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_public_quote_draft_rate_limits_expires_at
+      ON public_quote_draft_rate_limits(expires_at);
   `);
 
   return initializedDatabase;
@@ -671,4 +682,97 @@ function createServerReference(): string {
 function isReferenceCollision(error: unknown): boolean {
   return error instanceof Error
     && /UNIQUE constraint failed: public_(?:leads|quotations)\.reference/.test(error.message);
+}
+
+export const PUBLIC_QUOTE_DRAFT_RATE_LIMIT = 10;
+export const PUBLIC_QUOTE_DRAFT_RATE_WINDOW_MS = 60 * 60 * 1_000;
+export const PUBLIC_QUOTE_DRAFT_RATE_CLEANUP_MS = 24 * 60 * 60 * 1_000;
+
+export type PublicQuoteDraftRateLimitResult = {
+  allowed: boolean;
+  remaining: number;
+  expiresAt: Date;
+  retryAfterSeconds?: number;
+};
+
+export async function consumePublicQuoteDraftRateLimit(
+  clientIdentity: string,
+  options: { at?: Date } = {},
+): Promise<PublicQuoteDraftRateLimitResult> {
+  const db = await getDatabase();
+  const at = options.at ?? new Date();
+  const nowMs = at.getTime();
+  const nowIso = toIsoDate(at);
+  const windowExpiresMs = nowMs + PUBLIC_QUOTE_DRAFT_RATE_WINDOW_MS;
+  const cleanupBeforeIso = toIsoDate(new Date(nowMs - PUBLIC_QUOTE_DRAFT_RATE_CLEANUP_MS));
+  const bucketHash = createQuoteDraftBucketHash(clientIdentity);
+
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare("DELETE FROM public_quote_draft_rate_limits WHERE expires_at < ?")
+      .run(cleanupBeforeIso);
+
+    const existing = db.prepare(`
+      SELECT request_count, expires_at
+      FROM public_quote_draft_rate_limits
+      WHERE bucket_hash = ?
+    `).get(bucketHash) as { request_count: number; expires_at: string } | undefined;
+    const existingExpiry = existing === undefined ? Number.NEGATIVE_INFINITY : Date.parse(existing.expires_at);
+
+    if (existing === undefined || !Number.isFinite(existingExpiry) || existingExpiry <= nowMs) {
+      const expiresAt = new Date(windowExpiresMs);
+      db.prepare(`
+        INSERT INTO public_quote_draft_rate_limits (
+          bucket_hash, request_count, window_started_at, expires_at
+        ) VALUES (?, 1, ?, ?)
+        ON CONFLICT(bucket_hash) DO UPDATE SET
+          request_count = excluded.request_count,
+          window_started_at = excluded.window_started_at,
+          expires_at = excluded.expires_at
+      `).run(bucketHash, nowIso, expiresAt.toISOString());
+      db.exec("COMMIT");
+      return {
+        allowed: true,
+        remaining: PUBLIC_QUOTE_DRAFT_RATE_LIMIT - 1,
+        expiresAt,
+      };
+    }
+
+    if (existing.request_count >= PUBLIC_QUOTE_DRAFT_RATE_LIMIT) {
+      db.exec("COMMIT");
+      const expiresAt = new Date(existingExpiry);
+      return {
+        allowed: false,
+        remaining: 0,
+        expiresAt,
+        retryAfterSeconds: Math.max(1, Math.ceil((existingExpiry - nowMs) / 1_000)),
+      };
+    }
+
+    const requestCount = existing.request_count + 1;
+    db.prepare(`
+      UPDATE public_quote_draft_rate_limits
+      SET request_count = ?
+      WHERE bucket_hash = ?
+    `).run(requestCount, bucketHash);
+    db.exec("COMMIT");
+    return {
+      allowed: true,
+      remaining: PUBLIC_QUOTE_DRAFT_RATE_LIMIT - requestCount,
+      expiresAt: new Date(existingExpiry),
+    };
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+function createQuoteDraftBucketHash(clientIdentity: string): string {
+  // Only a keyed digest enters SQLite. The identity string is never persisted,
+  // logged, or included in an error path.
+  return createHmac("sha256", resolveQuoteDraftSigningKey()).update(
+    `public-quote-draft-client.v1\n${clientIdentity}`,
+    "utf8",
+  )
+    .digest("hex");
 }

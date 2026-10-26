@@ -7,6 +7,7 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it } from "vitest";
 
 import * as publicLabRequests from "@/app/api/public/lab/requests/route";
+import * as publicQuoteDrafts from "@/app/api/public/lab/quote-drafts/route";
 import LabPage from "@/app/lab/page";
 
 // This commit is the pre-public-LP baseline used by the G001-G006 branch history.
@@ -96,13 +97,16 @@ describe("public lab v1 negative boundaries", () => {
     }
   });
 
-  it("exposes exactly one public lab API route and no public history, admin, or CRM route", () => {
+  it("exposes exactly two public lab API routes and no public history, admin, or CRM route", () => {
     const apiRouteFiles = listFiles("src/app/api")
       .filter((path) => path.endsWith("route.ts"))
       .map((path) => path.replaceAll("\\", "/"));
     const publicRoutes = apiRouteFiles.filter((path) => path.includes("/public/"));
 
-    expect(publicRoutes).toEqual(["src/app/api/public/lab/requests/route.ts"]);
+    expect(publicRoutes).toEqual([
+      "src/app/api/public/lab/quote-drafts/route.ts",
+      "src/app/api/public/lab/requests/route.ts",
+    ]);
     for (const path of publicRoutes) {
       expect(path.toLowerCase()).not.toMatch(/history|admin|crm/);
     }
@@ -122,34 +126,46 @@ describe("public lab v1 negative boundaries", () => {
       await expect(response.json()).resolves.toEqual({ error: "method_not_allowed" });
     }
 
-    const source = readFileSync(
-      "src/app/api/public/lab/requests/route.ts",
-      "utf8",
-    );
-    expect(source).not.toMatch(/listPublic(?:Lead|Quotation)/);
-    expect(source).not.toMatch(/SELECT\s+.+\s+FROM\s+public_/i);
-    expect(source).not.toMatch(/DELETE\s+FROM\s+public_/i);
+    for (const source of [
+      readFileSync("src/app/api/public/lab/requests/route.ts", "utf8"),
+      readFileSync("src/app/api/public/lab/quote-drafts/route.ts", "utf8"),
+    ]) {
+      expect(source).not.toMatch(/listPublic(?:Lead|Quotation)/);
+      expect(source).not.toMatch(/SELECT\s+.+\s+FROM\s+public_/i);
+      expect(source).not.toMatch(/DELETE\s+FROM\s+public_/i);
+    }
   });
 
   it("does not expose public lead reads, enumeration, or deletion through any API route", () => {
     const routeFiles = listFiles("src/app/api").filter((path) =>
       path.endsWith("route.ts"),
     );
-    const publicRoute = "src/app/api/public/lab/requests/route.ts";
-    const publicRouteSource = readFileSync(publicRoute, "utf8");
-    const storeImports = [
-      ...publicRouteSource.matchAll(
+    const publicRoutes = [
+      "src/app/api/public/lab/requests/route.ts",
+      "src/app/api/public/lab/quote-drafts/route.ts",
+    ];
+    const storeImports = publicRoutes.flatMap((path) => [
+      ...readFileSync(path, "utf8").matchAll(
         /import\s*\{([^}]+)\}\s*from\s*"@\/lib\/public-lead-store"/g,
       ),
-    ].flatMap((match) => match[1].split(","));
+    ]).flatMap((match) => match[1].split(","));
 
     const importedNames = storeImports.map((name) => name.trim()).filter(Boolean);
-    expect(importedNames).toEqual(["savePublicLead", "savePublicQuotation"]);
-    expect(importedNames.every((name) => /^save/.test(name))).toBe(true);
+    expect(importedNames).toEqual([
+      "savePublicLead",
+      "savePublicQuotation",
+      "consumePublicQuoteDraftRateLimit",
+    ]);
+    expect(importedNames.every((name) => /^(?:save|consumePublicQuoteDraftRateLimit)/.test(name))).toBe(true);
 
     for (const path of routeFiles) {
       const source = readFileSync(path, "utf8");
-      if (path.replaceAll("\\", "/") === publicRoute) continue;
+      const publicPath = path.replaceAll("\\", "/");
+      if (publicPath === "src/app/api/public/lab/quote-drafts/route.ts") {
+        expect(source).not.toMatch(/public_leads|public_quotations/);
+        continue;
+      }
+      if (publicRoutes.includes(publicPath)) continue;
       expect(`${path}:${source}`).not.toMatch(/public-lead-store|public_leads|public_quotations/);
     }
   });

@@ -109,7 +109,7 @@ test("releases a quotation only after a valid lead submission", async ({ page },
   const email = `g008-quote-${Date.now()}-${testInfo.project.name}@example.com`;
   await page.goto("/lab");
 
-  await expect(page.getByLabel("サイズ")).toHaveValue("round-50x60");
+  await expect(page.getByTestId("lab-size")).toHaveValue("round-50x60");
   await expect(page.getByTestId("pre-gate-price-notice")).toContainText("単価・総額は");
   await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
   await expect(page.locator("#lab-quote")).not.toContainText("¥");
@@ -173,6 +173,35 @@ test("accepts an anonymous sample request without releasing a quote", async ({ p
   await expect(page.getByRole("heading", { name: "受け付けました。担当からご連絡いたします。" })).toBeVisible();
   await expect(page.getByTestId("request-reference")).toContainText("参照番号:");
   await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
+});
+
+test("issues a guest quote draft transport redirect in a URL fragment", async ({ page }) => {
+  await page.goto("/lab");
+  const form = page.getByTestId("embedded-quote-draft-form");
+  await expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
+  await expect(form.locator("select, input:not([type=hidden])")).toHaveCount(5);
+
+  const response = await page.request.post("http://127.0.0.1:3100/api/public/lab/quote-drafts", {
+    maxRedirects: 0,
+    headers: { origin: "http://127.0.0.1:3100" },
+    form: {
+      colorCount: "2",
+      designId: "rda",
+      fillAmount: "1.50",
+      locale: "ja",
+      quantity: "10000",
+      sizeKey: "round-60x80",
+    },
+  });
+  expect(response.status()).toBe(303);
+  const location = response.headersArray().find((header) => header.name.toLowerCase() === "location")?.value;
+  expect(location).toMatch(/^http:\/\/127\.0\.0\.1:3100\/quote#quoteDraft=/);
+
+  const destination = new URL(location!);
+  expect(destination.pathname).toBe("/quote");
+  expect(destination.search).toBe("");
+  expect(destination.searchParams.size).toBe(0);
+  expect(destination.hash.length).toBeGreaterThan("#quoteDraft=".length);
 });
 
 test("redirects protected internal pages to login", async ({ page }) => {

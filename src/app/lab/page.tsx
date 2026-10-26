@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import styles from "./page.module.css";
 import { LabRequestForm } from "./lab-request-form";
+import { EmbeddedQuoteDraftForm } from "./embedded-quote-draft-form";
 import rdaPouch from "./images/generated/RDA-real-edited.png";
 import tuaPouch from "./images/generated/TUA-real-edited.png";
 import btaPouch from "./images/generated/BTA-real-premium.png";
@@ -459,6 +460,25 @@ export default async function LabPage({ searchParams }: LabPageProps) {
             <div id="lab-quote-consultation" className={styles.quoteForm}>
               <LabRequestForm initialRequestType={initialRequestType} />
             </div>
+          </div>
+        </section>
+
+        <section
+          id="lab-quote-draft"
+          className={`${styles.section} ${styles.quoteSection}`}
+          aria-labelledby="lab-quote-draft-heading"
+        >
+          <div className={styles.quoteForm}>
+            <div className={styles.sectionHead}>
+              <p className={styles.sectionLabel}>下書き｜DRAFT</p>
+              <h2 className={styles.sectionHeading} id="lab-quote-draft-heading">
+                条件だけ保存して後で再開
+              </h2>
+              <p className={styles.sectionLead}>
+                連絡先を送らずに仕様の下書きを発行できます。発行URLは60分間だけ有効です。
+              </p>
+            </div>
+            <EmbeddedQuoteDraftForm />
           </div>
         </section>
 

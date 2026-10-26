@@ -61,6 +61,8 @@ export default defineConfig({
         "ADMIN_EMAIL=admin@pouch-e2e.test",
         "ADMIN_PASSWORD=admin-e2e-password",
         "ADMIN_NAME='E2E Administrator'",
+        "POUCH_QUOTE_DRAFT_SIGNING_KEY='g004-local-only-signing-key-0123456789abcdef'",
+        "POUCH_QUOTE_DRAFT_ALLOWED_ORIGINS=http://127.0.0.1:3100",
         "npm run dev -- -H 127.0.0.1 -p 3100",
       ].join(" "),
     ].join("; "),
