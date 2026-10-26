@@ -1,4 +1,5 @@
 import type { PublicLabSizeKey } from "./public-lab-options";
+import { getPublicLabSizeRule } from "./public-lab-rules";
 
 export type PublicQuoteDraftDesignId =
   | "rda"
@@ -17,6 +18,27 @@ export interface PublicQuoteDraftDesignOption {
 export const publicQuoteDraftLocales = [
   "ja",
 ] as const satisfies readonly PublicQuoteDraftLocale[];
+
+export const publicQuoteDraftFillOptions = Object.freeze(["1", "2", "3", "5", "10"] as const);
+
+const DESIGN_FILL_OPTIONS = Object.freeze({
+  rda: ["1", "2", "3", "5", "10"],
+  tua: ["1", "3", "5", "10"],
+  bta: ["1", "2", "5", "10"],
+  cra: ["1", "2"],
+} as const satisfies Record<PublicQuoteDraftDesignId, readonly string[]>);
+
+export function acceptsPublicQuoteDraftFill(
+  designId: string,
+  sizeKey: PublicLabSizeKey | string,
+  fillAmount: string,
+): boolean {
+  const design = getPublicQuoteDraftDesign(designId);
+  if (!design || !design.sizeKeys.includes(sizeKey as PublicLabSizeKey)) return false;
+  const shapeCode = getPublicLabSizeRule(sizeKey).shapeCode;
+  if (shapeCode === "SPA" || shapeCode === "XRA") return fillAmount === "1";
+  return (DESIGN_FILL_OPTIONS[design.id] as readonly string[]).includes(fillAmount);
+}
 
 export const publicQuoteDraftDesignOptions = [
   {

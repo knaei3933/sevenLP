@@ -22,7 +22,7 @@ const url = "https://lp.example.com/api/public/lab/quote-drafts";
 const fields = new URLSearchParams({
   colorCount: "3",
   designId: "rda",
-  fillAmount: "2.50",
+  fillAmount: "3",
   locale: "ja",
   quantity: "10000",
   sizeKey: "round-60x80",
@@ -78,7 +78,7 @@ describe("POST /api/public/lab/quote-drafts", () => {
     expect(payload).toEqual(expect.objectContaining({
       colorCount: 3,
       designId: "rda",
-      fillAmount: "2.5",
+      fillAmount: "3",
       locale: "ja",
       quantity: 10_000,
       sizeKey: "round-60x80",

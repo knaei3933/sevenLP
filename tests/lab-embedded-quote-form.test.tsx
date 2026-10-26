@@ -21,11 +21,11 @@ describe("embedded G004 quote draft form", () => {
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
     const visibleFields = form.querySelectorAll("select, input:not([type='hidden'])");
-    expect(visibleFields).toHaveLength(5);
+    expect(visibleFields).toHaveLength(9);
     expect([...visibleFields].map((field) => field.getAttribute("name"))).toEqual([
+      ...Array.from({ length: 5 }, () => "fillAmount"),
       "designId",
       "sizeKey",
-      "fillAmount",
       "colorCount",
       "quantity",
     ]);
@@ -40,6 +40,29 @@ describe("embedded G004 quote draft form", () => {
     expect(source).not.toMatch(/fetch\s*\(/);
     expect(source).not.toMatch(/\/api\/public\/lab\/requests|\/api\/calculate/);
     expect(source).not.toMatch(/POUCH_QUOTE_DRAFT_SIGNING_KEY|node:crypto/);
+  });
+
+  it("chooses fill first and disables incompatible designs and sizes with Japanese help", async () => {
+    const user = userEvent.setup();
+    render(<EmbeddedQuoteDraftForm />);
+    const form = screen.getByTestId("embedded-quote-draft-form");
+    const fillGroup = within(form).getByTestId("quote-draft-fill-options");
+    expect(form).toHaveTextContent("充填量に対応しないデザイン・サイズは選択できません。");
+    expect(fillGroup).toHaveTextContent("1g");
+    expect(fillGroup).toHaveTextContent("2g");
+    expect(fillGroup).toHaveTextContent("3g");
+    expect(fillGroup).toHaveTextContent("5g");
+    expect(fillGroup).toHaveTextContent("10g");
+
+    await user.click(within(form).getByRole("radio", { name: "5g" }));
+    const design = within(form).getByLabelText("デザイン") as HTMLSelectElement;
+    const craOption = [...design.options].find((option) => option.value === "cra");
+    expect(craOption).toHaveTextContent("5g非対応");
+    expect(craOption).toBeDisabled();
+    expect(within(form).getByTestId("quote-draft-size")).toHaveValue("round-50x60");
+
+    await user.click(within(form).getByRole("radio", { name: "2g" }));
+    expect(within(form).getByTestId("quote-draft-size")).toHaveValue("round-50x60");
   });
 
   it("constrains size and quantity by the selected design", async () => {

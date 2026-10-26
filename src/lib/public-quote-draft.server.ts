@@ -3,6 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { publicLabSizeOptions, type PublicLabSizeKey } from "./public-lab-options";
 import { getPublicLabSizeRule } from "./public-lab-rules";
 import {
+  acceptsPublicQuoteDraftFill,
   getPublicQuoteDraftDesign,
   isPublicQuoteDraftLocale,
   publicQuoteDraftLocales,
@@ -199,8 +200,7 @@ function createValidatedPayload(
   const rule = getPublicLabSizeRule(sizeKey);
   if (
     fillAmount === undefined
-    || Number(fillAmount) < rule.capacity.min
-    || Number(fillAmount) > rule.capacity.max
+    || !acceptsPublicQuoteDraftFill(designId, sizeKey, fillAmount)
   ) {
     throw new PublicQuoteDraftError("invalid_request");
   }
@@ -271,8 +271,7 @@ function validatePayloadShape(payload: Record<string, unknown>): void {
     || payload.quantity < rule.minimumQuantity
     || payload.quantity > QUOTE_DRAFT_MAX_QUANTITY
     || fillAmount !== canonicalizeAmount(fillAmount)
-    || Number(fillAmount) < rule.capacity.min
-    || Number(fillAmount) > rule.capacity.max
+    || !acceptsPublicQuoteDraftFill(designId, sizeKey, fillAmount)
   ) {
     throw new PublicQuoteDraftError("invalid_token");
   }
