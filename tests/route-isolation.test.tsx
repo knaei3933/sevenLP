@@ -10,6 +10,14 @@ const projectRoot = path.resolve(import.meta.dirname, "..");
 const requestAt = (pathWithQuery: string) => new NextRequest(`https://package-lab.test${pathWithQuery}`);
 
 describe("public lab proxy access", () => {
+  it("renders the public LP at the canonical root", () => {
+    const response = proxy(requestAt("/?from=email"));
+
+    expect(response).toBeInstanceOf(NextResponse);
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("x-middleware-rewrite")).toContain("/lab");
+  });
+
   it("allows /lab and /lab/ anonymously with any query variant", () => {
     for (const pathWithQuery of ["/lab", "/lab/", "/lab?from=email", "/lab/?plan=sample"]) {
       const response = proxy(requestAt(pathWithQuery));
@@ -20,7 +28,7 @@ describe("public lab proxy access", () => {
   });
 
   it("redirects anonymous visitors from protected internal page routes to login", () => {
-    for (const pathname of ["/", "/quote", "/history", "/checklists/current", "/admin/users"]) {
+    for (const pathname of ["/quote", "/history", "/checklists/current", "/admin/users"]) {
       const response = proxy(requestAt(pathname));
       const login = new URL(response.headers.get("location") ?? "");
 
