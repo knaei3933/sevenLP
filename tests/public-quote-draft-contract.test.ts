@@ -8,21 +8,23 @@ import { afterAll, afterEach, describe, expect, it } from "vitest";
 process.env.POUCH_QUOTE_DRAFT_SIGNING_KEY = "a".repeat(64);
 process.env.POUCH_QUOTE_DRAFT_ALLOWED_ORIGINS = "https://lp.example.com";
 
+const { publicQuoteDraftDesignOptions } = await import("@/lib/public-quote-draft-options");
 const {
   issuePublicQuoteDraft,
   PublicQuoteDraftError,
   QUOTE_DRAFT_MAX_AGE_SECONDS,
   QUOTE_DRAFT_MAX_ENCODED_BYTES,
+  QUOTE_DRAFT_MAX_QUANTITY,
   verifyPublicQuoteDraft,
 } = await import("@/lib/public-quote-draft.server");
 
 const validInput = {
   colorCount: 2,
-  designId: "spa",
+  designId: "rda",
   fillAmount: "1.00",
   locale: "ja",
   quantity: 50_000,
-  sizeKey: "spa-35x80",
+  sizeKey: "round-50x60",
 };
 
 function payloadFrom(token: string): Record<string, unknown> {
@@ -83,14 +85,14 @@ describe("signed guest quote draft contract", () => {
     ]);
     expect(payload).toEqual({
       colorCount: 2,
-      designId: "spa",
+      designId: "rda",
       expiresAt: 1767326645,
       fillAmount: "1",
       issuedAt: 1767323045,
       locale: "ja",
       nonce: payload.nonce,
       quantity: 50_000,
-      sizeKey: "spa-35x80",
+      sizeKey: "round-50x60",
     });
     expect(Buffer.from(String(payload.nonce), "base64url")).toHaveLength(16);
     expect(() => verifyPublicQuoteDraft(issued.token, {
@@ -101,8 +103,8 @@ describe("signed guest quote draft contract", () => {
   it("DRAFT-002A rejects unknown fields, invalid design constraints, and unknown tokens", () => {
     expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, unknown: true }));
     expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, sizeKey: "tube-35x60" }));
-    expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, fillAmount: "2" }));
-    expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, quantity: 10_000 }));
+    expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, fillAmount: "0.50" }));
+    expectError("invalid_request", () => issuePublicQuoteDraft({ ...validInput, quantity: 9_999 }));
     expectError("invalid_token", () => verifyPublicQuoteDraft("unknown-token"));
     expectError("invalid_token", () => verifyPublicQuoteDraft(null));
   });
@@ -140,6 +142,28 @@ describe("signed guest quote draft contract", () => {
     expect(Buffer.byteLength(issued.token, "utf8")).toBeLessThanOrEqual(QUOTE_DRAFT_MAX_ENCODED_BYTES);
     expect(Buffer.byteLength(issued.token.split(".")[1]!, "utf8")).toBeLessThanOrEqual(QUOTE_DRAFT_MAX_ENCODED_BYTES);
     expectError("invalid_token", () => verifyPublicQuoteDraft(`public-quote-draft.v1.${"A".repeat(2049)}.B`));
+  });
+
+  it("allows exactly the approved RDA/CRA/TUA/BTA designs and rejects five million and one", () => {
+    expect(publicQuoteDraftDesignOptions.map((design) => design.id)).toEqual(["rda", "tua", "bta", "cra"]);
+    expect(QUOTE_DRAFT_MAX_QUANTITY).toBe(5_000_000);
+    expectError("invalid_request", () => issuePublicQuoteDraft({
+      ...validInput,
+      quantity: QUOTE_DRAFT_MAX_QUANTITY + 1,
+    }));
+    expect(() => issuePublicQuoteDraft({
+      ...validInput,
+      quantity: QUOTE_DRAFT_MAX_QUANTITY,
+    })).not.toThrow();
+  });
+
+  it("normalizes configured signing keys identically for issue and verification", () => {
+    const issued = issuePublicQuoteDraft(validInput, {
+      env: { NODE_ENV: "test", POUCH_QUOTE_DRAFT_SIGNING_KEY: `  ${"c".repeat(32)}\n` },
+    });
+    expect(() => verifyPublicQuoteDraft(issued.token, {
+      env: { NODE_ENV: "test", POUCH_QUOTE_DRAFT_SIGNING_KEY: `\t${"c".repeat(32)} ` },
+    })).not.toThrow();
   });
 
   it("validates the signing key only when production or a non-production key is supplied", async () => {
@@ -180,14 +204,14 @@ describe("signed guest quote draft contract", () => {
     expect(signature).toBe(expected);
     const canonical = JSON.stringify({
       colorCount: 2,
-      designId: "spa",
+      designId: "rda",
       expiresAt: issued.payload.expiresAt,
       fillAmount: "1",
       issuedAt: issued.payload.issuedAt,
       locale: "ja",
       nonce: issued.payload.nonce,
       quantity: 50_000,
-      sizeKey: "spa-35x80",
+      sizeKey: "round-50x60",
     });
     expect(Buffer.from(encodedPayload!, "base64url").toString("utf8")).toBe(canonical);
   });

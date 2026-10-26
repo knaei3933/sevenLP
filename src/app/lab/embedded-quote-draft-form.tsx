@@ -18,7 +18,7 @@ export function EmbeddedQuoteDraftForm() {
   const [designId, setDesignId] = useState<PublicQuoteDraftDesignId>(firstDesign.id);
   const [sizeKey, setSizeKey] = useState<PublicLabSizeKey>(firstDesign.sizeKeys[0]);
   const [fillAmount, setFillAmount] = useState("1");
-  const [quantity, setQuantity] = useState(firstDesign.sizeKeys[0].startsWith("spa-") ? 50_000 : 10_000);
+  const [quantity, setQuantity] = useState(10_000);
 
   const selectedDesign = publicQuoteDraftDesignOptions.find((design) => design.id === designId)
     ?? firstDesign;
@@ -118,7 +118,7 @@ export function EmbeddedQuoteDraftForm() {
           id="quote-draft-quantity"
           value={quantity}
           onChange={(event) => setQuantity(Number(event.target.value))}
-          max={10_000_000}
+          max={5_000_000}
           min={rule.minimumQuantity}
           name="quantity"
           required

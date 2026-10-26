@@ -20,6 +20,7 @@ const ALLOWED_FIELDS = new Set([
   "quantity",
   "sizeKey",
 ]);
+const DEFAULT_COMPLETION_URL = "http://127.0.0.1:4400/portal/quotes/new";
 
 type SafeFieldErrors = {
   errors: { field?: string; code: string }[];
@@ -81,7 +82,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     const draft = issuePublicQuoteDraft(parsed.data);
-    const destination = new URL("/quote", request.headers.get("origin")!);
+    const destination = resolveQuoteDraftCompletionUrl(process.env);
     destination.hash = `quoteDraft=${encodeURIComponent(draft.token)}`;
     if (destination.search !== "") throw new PublicQuoteDraftError("invalid_request");
     const response = NextResponse.redirect(destination.toString(), 303);
@@ -172,11 +173,28 @@ function resolveAllowedOrigins(env: NodeJS.ProcessEnv): Set<string> {
   return origins;
 }
 
-function clientBucketIdentity(request: Request): string {
-  const forwardedFor = request.headers.get("x-forwarded-for")
-    ?.split(",", 1)[0]
-    ?.trim();
-  return forwardedFor || request.headers.get("real-client-ip")?.trim() || "unknown";
+function resolveQuoteDraftCompletionUrl(env: NodeJS.ProcessEnv): URL {
+  const destination = new URL(env.POUCH_PORTAL_QUOTE_COMPLETION_URL || DEFAULT_COMPLETION_URL);
+  if (
+    destination.protocol !== "https:" && destination.protocol !== "http:"
+    || destination.username !== ""
+    || destination.password !== ""
+    || destination.pathname === ""
+    || destination.search !== ""
+    || destination.hash !== ""
+  ) {
+    throw new PublicQuoteDraftError("invalid_completion_url");
+  }
+  destination.hash = "";
+  return destination;
+}
+
+function clientBucketIdentity(request: Request, env: NodeJS.ProcessEnv = process.env): string {
+  const trustedProxy = env.POUCH_QUOTE_DRAFT_TRUSTED_PROXY?.trim().toLowerCase();
+  if (trustedProxy !== "true" && trustedProxy !== "1") return "direct-peer";
+  return request.headers.get("x-forwarded-for")?.split(",", 1)[0]?.trim()
+    || request.headers.get("x-real-ip")?.trim()
+    || "unknown";
 }
 
 function parseFields(

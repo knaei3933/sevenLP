@@ -67,10 +67,10 @@ describe("POST /api/public/lab/quote-drafts", () => {
     expect(response.status).toBe(303);
     expect(response.headers.get("cache-control")).toBe("no-store");
     const location = response.headers.get("location");
-    expect(location).toMatch(/^https:\/\/lp\.example\.com\/quote#quoteDraft=/);
+    expect(location).toMatch(/^http:\/\/127\.0\.0\.1:4400\/portal\/quotes\/new#quoteDraft=/);
 
     const destination = new URL(location!);
-    expect(destination.pathname).toBe("/quote");
+    expect(destination.pathname).toBe("/portal/quotes/new");
     expect(destination.search).toBe("");
     expect(destination.searchParams.size).toBe(0);
     const token = decodeURIComponent(destination.hash.slice("#quoteDraft=".length));
@@ -103,17 +103,52 @@ describe("POST /api/public/lab/quote-drafts", () => {
     expect(await countPublicQuotations()).toBe(0);
   });
 
-  it("returns 429 after ten durable route requests", async () => {
-    for (let index = 0; index < 10; index += 1) {
+  it("uses the direct peer rather than spoofable forwarding headers for durable rate limits", async () => {
+    const first = await POST(request());
+    const spoofed = await POST(request({ headers: {
+      "x-forwarded-for": "192.0.2.9",
+      "x-real-ip": "192.0.2.9",
+      "real-client-ip": "192.0.2.9",
+    } }));
+    expect(first.status).toBe(303);
+    expect(spoofed.status).toBe(303);
+    for (let index = 0; index < 8; index += 1) {
       const response = await POST(request());
       expect(response.status).toBe(303);
     }
-    const denied = await POST(request());
+    const denied = await POST(request({ headers: {
+      "x-forwarded-for": "203.0.113.1",
+      "x-real-ip": "203.0.113.1",
+      "real-client-ip": "203.0.113.1",
+    } }));
     expect(denied.status).toBe(429);
     expect(denied.headers.get("retry-after")).toBe("3600");
     await expect(denied.json()).resolves.toEqual({ error: "rate_limited" });
     expect(await countPublicLeads()).toBe(0);
     expect(await countPublicQuotations()).toBe(0);
+  });
+
+  it("uses proxy headers only when the proxy is explicitly trusted", async () => {
+    process.env.POUCH_QUOTE_DRAFT_TRUSTED_PROXY = "true";
+    try {
+      const firstHeaders = {
+        "x-forwarded-for": "192.0.2.10",
+        "x-real-ip": "192.0.2.10",
+        "real-client-ip": "192.0.2.10",
+      };
+      expect((await POST(request({ headers: firstHeaders }))).status).toBe(303);
+      for (let index = 0; index < 9; index += 1) {
+        expect((await POST(request({ headers: firstHeaders }))).status).toBe(303);
+      }
+      expect((await POST(request({ headers: firstHeaders }))).status).toBe(429);
+      expect((await POST(request({ headers: {
+        "x-forwarded-for": "192.0.2.11",
+        "x-real-ip": "192.0.2.11",
+        "real-client-ip": "192.0.2.11",
+      } }))).status).toBe(303);
+    } finally {
+      delete process.env.POUCH_QUOTE_DRAFT_TRUSTED_PROXY;
+    }
   });
 
   it("DRAFT-008A exposes only POST with a safe no-store 405 contract", async () => {

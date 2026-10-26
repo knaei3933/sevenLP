@@ -53,11 +53,15 @@ describe("embedded G004 quote draft form", () => {
     expect(size).toHaveValue("round-50x60");
     expect(quantity).toHaveValue(10_000);
 
-    await user.selectOptions(design, "spa");
-    expect(size).toHaveValue("spa-35x80");
-    expect(quantity).toHaveValue(50_000);
-    expect(within(size).getAllByRole("option")).toHaveLength(1);
-    expect(quantity).toHaveAttribute("min", "50000");
+    const designValues = [...(design as HTMLSelectElement).options].map((option) => option.value);
+    expect(designValues).toEqual(["rda", "tua", "bta", "cra"]);
+    expect(designValues).not.toContain("spa");
+    expect(designValues).not.toContain("xra");
+    expect(designValues).not.toContain("mow");
+    await user.selectOptions(design, "cra");
+    expect(size).toHaveValue("circle-70x70");
+    expect(quantity).toHaveValue(10_000);
+    expect(quantity).toHaveAttribute("max", "5000000");
   });
 
   it("keeps the existing consultation and sample form route intact", async () => {

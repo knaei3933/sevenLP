@@ -4,10 +4,7 @@ export type PublicQuoteDraftDesignId =
   | "rda"
   | "tua"
   | "bta"
-  | "cra"
-  | "spa"
-  | "xra"
-  | "mow";
+  | "cra";
 
 export type PublicQuoteDraftLocale = "ja";
 
@@ -52,9 +49,6 @@ export const publicQuoteDraftDesignOptions = [
     ],
   },
   { id: "cra", label: "丸形（CRA）", sizeKeys: ["circle-70x70"] },
-  { id: "spa", label: "スポイトボトル（SPA）", sizeKeys: ["spa-35x80"] },
-  { id: "xra", label: "スリムドーズ（XRA）", sizeKeys: ["xra-38.5x90"] },
-  { id: "mow", label: "マウスウォッシュ（MOW）", sizeKeys: ["mouthwash-45x145"] },
 ] as const satisfies readonly PublicQuoteDraftDesignOption[];
 
 export function getPublicQuoteDraftDesign(

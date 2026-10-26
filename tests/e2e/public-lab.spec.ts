@@ -195,10 +195,10 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
   });
   expect(response.status()).toBe(303);
   const location = response.headersArray().find((header) => header.name.toLowerCase() === "location")?.value;
-  expect(location).toMatch(/^http:\/\/127\.0\.0\.1:3100\/quote#quoteDraft=/);
+  expect(location).toMatch(/^http:\/\/127\.0\.0\.1:4400\/portal\/quotes\/new#quoteDraft=/);
 
   const destination = new URL(location!);
-  expect(destination.pathname).toBe("/quote");
+  expect(destination.pathname).toBe("/portal/quotes/new");
   expect(destination.search).toBe("");
   expect(destination.searchParams.size).toBe(0);
   expect(destination.hash.length).toBeGreaterThan("#quoteDraft=".length);

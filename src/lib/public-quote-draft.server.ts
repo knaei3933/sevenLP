@@ -24,7 +24,7 @@ export const QUOTE_DRAFT_MAX_ENCODED_BYTES = 2 * 1024;
 const QUOTE_DRAFT_TOKEN_FORMAT = /^public-quote-draft\.v1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/;
 const NONCE_BYTES = 16;
 const FILL_AMOUNT_PATTERN = /^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/;
-const MAX_QUANTITY = 10_000_000;
+export const QUOTE_DRAFT_MAX_QUANTITY = 5_000_000;
 const CANONICAL_KEYS = [
   "colorCount",
   "designId",
@@ -69,7 +69,7 @@ type RequestEnv = NodeJS.ProcessEnv;
 export function resolveQuoteDraftSigningKey(
   env: RequestEnv = process.env,
 ): Buffer {
-  const configured = env.POUCH_QUOTE_DRAFT_SIGNING_KEY;
+  const configured = env.POUCH_QUOTE_DRAFT_SIGNING_KEY?.trim();
   if (configured !== undefined && configured.length > 0) {
     const key = Buffer.from(configured, "utf8");
     if (key.byteLength < 32) {
@@ -210,7 +210,7 @@ function createValidatedPayload(
   if (!isInteger(colorCount) || colorCount < 1 || colorCount > 10) {
     throw new PublicQuoteDraftError("invalid_request");
   }
-  if (!isInteger(quantity) || quantity < rule.minimumQuantity || quantity > MAX_QUANTITY) {
+  if (!isInteger(quantity) || quantity < rule.minimumQuantity || quantity > QUOTE_DRAFT_MAX_QUANTITY) {
     throw new PublicQuoteDraftError("invalid_request");
   }
 
@@ -269,7 +269,7 @@ function validatePayloadShape(payload: Record<string, unknown>): void {
     || payload.colorCount < 1
     || payload.colorCount > 10
     || payload.quantity < rule.minimumQuantity
-    || payload.quantity > MAX_QUANTITY
+    || payload.quantity > QUOTE_DRAFT_MAX_QUANTITY
     || fillAmount !== canonicalizeAmount(fillAmount)
     || Number(fillAmount) < rule.capacity.min
     || Number(fillAmount) > rule.capacity.max
