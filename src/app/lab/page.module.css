@@ -725,6 +725,116 @@
   box-shadow: var(--lp-shadow-raised);
 }
 
+.requestSection {
+  background: var(--lp-canvas-soft);
+}
+
+.requestShell {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  border: var(--lp-border);
+  border-top: 4px solid var(--lp-brand);
+  border-radius: var(--lp-radius-large);
+  background: #fff;
+  padding: clamp(18px, 4vw, 32px);
+  box-shadow: var(--lp-shadow-raised);
+}
+
+.requestBody {
+  display: grid;
+  gap: 22px;
+}
+
+.requestTabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  width: min(340px, 100%);
+  margin: 0 auto;
+  border: 1px solid var(--lp-line);
+  border-radius: 999px;
+  background: var(--lp-canvas-soft);
+  padding: 4px;
+}
+
+.requestTabs .tab,
+.requestTabs .selectedTab {
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lp-muted);
+  font-size: .86rem;
+  font-weight: 750;
+}
+
+.requestTabs .selectedTab {
+  background: var(--lp-brand);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(142, 63, 69, .12);
+}
+
+.requestForm {
+  display: grid;
+  gap: 20px;
+}
+
+.requestForm .field {
+  margin-top: 0;
+}
+
+.contactGrid {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 720px) {
+  .contactGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fieldHint {
+  color: var(--lp-muted);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.requestConsent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-md);
+  background: var(--lp-canvas-soft);
+  padding: 15px;
+}
+
+.requestConsent input {
+  width: 44px;
+  height: 44px;
+  margin: 2px;
+  accent-color: var(--lp-brand);
+}
+
+.requestConsent label {
+  color: var(--lp-ink);
+  font-size: .85rem;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+.requestResult {
+  border: var(--lp-border);
+  border-top: 4px solid var(--sp-success);
+  border-radius: var(--lp-radius-lg);
+  background: #fff;
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--lp-shadow-raised);
+}
+
 .quoteFormShell {
   display: grid;
   gap: 24px;

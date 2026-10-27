@@ -183,7 +183,7 @@ export function LabRequestForm({
 
   if (result) {
     return (
-      <section className={styles.result} aria-labelledby="lab-request-result-heading" role="status">
+      <section className={styles.requestResult} aria-labelledby="lab-request-result-heading" role="status">
         <h3
           className={styles.resultTitle}
           id="lab-request-result-heading"
@@ -195,11 +195,9 @@ export function LabRequestForm({
     );
   }
 
-  const selectedTypeLabel = contactTypeOptions.find((option) => option.value === requestType)?.label;
-
   return (
-    <div className={styles.formShell}>
-      <div className={styles.tabs} role="tablist" aria-label="依頼種別">
+    <div className={styles.requestBody}>
+      <div className={styles.requestTabs} role="tablist" aria-label="依頼種別">
         {contactTypeOptions.map((option) => {
           const selected = option.value === requestType;
           return (
@@ -224,7 +222,7 @@ export function LabRequestForm({
 
       <form
         id="lab-request-fields"
-        className={styles.form}
+        className={styles.requestForm}
         role="tabpanel"
         aria-labelledby={`lab-tab-${requestType}`}
         noValidate
@@ -234,64 +232,68 @@ export function LabRequestForm({
           <p className={styles.summaryError} data-testid="lab-summary-error" role="alert">{summaryError}</p>
         )}
 
-        <div className={styles.field}>
-          <label htmlFor="lab-company">会社名</label>
-          <input
-            {...fieldErrorProps("company")}
-            data-testid="lab-company"
-            type="text"
-            name="company"
-            autoComplete="organization"
-            required
-            value={company}
-            onChange={(event) => setCompany(event.target.value)}
-          />
-          {errorText("company")}
+        <div className={styles.contactGrid}>
+          <div className={styles.field}>
+            <label htmlFor="lab-company">会社名</label>
+            <input
+              {...fieldErrorProps("company")}
+              data-testid="lab-company"
+              type="text"
+              name="company"
+              autoComplete="organization"
+              required
+              value={company}
+              onChange={(event) => setCompany(event.target.value)}
+            />
+            {errorText("company")}
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="lab-contactName">お名前</label>
+            <input
+              {...fieldErrorProps("contactName")}
+              data-testid="lab-contact-name"
+              type="text"
+              name="contactName"
+              autoComplete="name"
+              required
+              value={contactName}
+              onChange={(event) => setContactName(event.target.value)}
+            />
+            {errorText("contactName")}
+          </div>
         </div>
 
-        <div className={styles.field}>
-          <label htmlFor="lab-contactName">お名前</label>
-          <input
-            {...fieldErrorProps("contactName")}
-            data-testid="lab-contact-name"
-            type="text"
-            name="contactName"
-            autoComplete="name"
-            required
-            value={contactName}
-            onChange={(event) => setContactName(event.target.value)}
-          />
-          {errorText("contactName")}
-        </div>
+        <div className={styles.contactGrid}>
+          <div className={styles.field}>
+            <label htmlFor="lab-email">メールアドレス</label>
+            <input
+              {...fieldErrorProps("email")}
+              data-testid="lab-email"
+              type="email"
+              name="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+            {errorText("email")}
+          </div>
 
-        <div className={styles.field}>
-          <label htmlFor="lab-email">メールアドレス</label>
-          <input
-            {...fieldErrorProps("email")}
-            data-testid="lab-email"
-            type="email"
-            name="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-          {errorText("email")}
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="lab-phone">電話番号</label>
-          <input
-            {...fieldErrorProps("phone")}
-            data-testid="lab-phone"
-            type="tel"
-            name="phone"
-            autoComplete="tel"
-            required
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-          />
-          {errorText("phone")}
+          <div className={styles.field}>
+            <label htmlFor="lab-phone">電話番号</label>
+            <input
+              {...fieldErrorProps("phone")}
+              data-testid="lab-phone"
+              type="tel"
+              name="phone"
+              autoComplete="tel"
+              required
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+            />
+            {errorText("phone")}
+          </div>
         </div>
 
         <div className={styles.field}>
@@ -305,9 +307,10 @@ export function LabRequestForm({
             value={message}
             onChange={(event) => setMessage(event.target.value)}
           />
+          <span className={styles.fieldHint}>内容物・用途・希望時期など、わかる範囲でご記入ください。</span>
         </div>
 
-        <div className={styles.consent}>
+        <div className={styles.requestConsent}>
           <input
             {...fieldErrorProps("consentAccepted")}
             data-testid="lab-consent"
@@ -340,7 +343,6 @@ export function LabRequestForm({
         <button className={styles.submit} data-testid="lab-submit" type="submit" disabled={pending}>
           {pending ? "送信中です" : requestType === "consultation" ? "相談内容を送信する" : "サンプル依頼を送信する"}
         </button>
-        <p className={styles.formNote}>依頼種別: {selectedTypeLabel}</p>
       </form>
     </div>
   );

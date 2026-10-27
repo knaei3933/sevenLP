@@ -453,17 +453,17 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </div>
         </section>
 
-        <section id="lab-request" className={`${styles.section} ${styles.quoteSection}`} aria-labelledby="lab-request-heading">
-          <div className={styles.quoteForm}>
-            <div className={styles.sectionHead}>
-              <p className={styles.sectionLabel}>サンプル・ご相談｜REQUEST</p>
-              <h2 className={styles.sectionHeading} id="lab-request-heading">
-                条件が未確定なら相談から進める
-              </h2>
-              <p className={styles.sectionLead}>
-                正式見積もりの条件がまだ固まらない場合は、内容物・用途・希望時期をご相談ください。
-              </p>
-            </div>
+        <section id="lab-request" className={`${styles.section} ${styles.requestSection}`} aria-labelledby="lab-request-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>サンプル・ご相談｜REQUEST</p>
+            <h2 className={styles.sectionHeading} id="lab-request-heading">
+              条件が未確定なら相談から進める
+            </h2>
+            <p className={styles.sectionLead}>
+              正式見積もりの条件がまだ固まらない場合は、内容物・用途・希望時期をご相談ください。
+            </p>
+          </div>
+          <div className={styles.requestShell}>
             <div id="lab-quote-consultation">
               <LabRequestForm initialRequestType={initialRequestType} />
             </div>
