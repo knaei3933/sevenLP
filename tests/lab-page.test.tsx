@@ -11,8 +11,8 @@ describe("public lab identity", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "小容量パウチを、1万枚から仕様入力だけで進める。" })).toBeInTheDocument();
     expect(screen.getAllByText("Epackage Labのパウチ充填専門サービス").length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: "形状と数量を選んで見積もりを確認" })).toHaveAttribute("href", "#lab-quote");
-    expect(screen.getByRole("link", { name: "条件が未確定なら相談から始める" })).toHaveAttribute("href", "?requestType=consultation#lab-quote-consultation");
+    expect(screen.getByRole("link", { name: "形状と数量を選んで見積もりを確認" })).toHaveAttribute("href", "/lab#lab-quote");
+    expect(screen.getByRole("link", { name: "条件が未確定なら相談から始める" })).toHaveAttribute("href", "?requestType=consultation#lab-request");
     expect(screen.getAllByText("化粧水").length).toBeGreaterThan(0);
     expect(screen.getAllByText("単回使い切り").length).toBeGreaterThan(0);
     expect(screen.queryByRole("link", { name: "サンプル・仕様を相談" })).not.toBeInTheDocument();
@@ -27,13 +27,24 @@ describe("public lab identity", () => {
     const header = screen.getByRole("banner");
     const navigation = within(header).getByRole("navigation", { name: "メインナビゲーション" });
     expect(within(navigation).getByRole("link", { name: "製品仕様" })).toHaveAttribute("href", "#lab-products");
-    expect(within(navigation).getByRole("link", { name: "見積もり" })).toHaveAttribute("href", "#lab-quote");
+    expect(within(navigation).getByRole("link", { name: "見積もり" })).toHaveAttribute("href", "/lab#lab-quote");
     expect(within(navigation).getByRole("link", { name: "品質体制" })).toHaveAttribute("href", "#lab-quality");
     expect(within(navigation).getByRole("link", { name: "進め方" })).toHaveAttribute("href", "#lab-process");
     expect(within(navigation).getByRole("link", { name: "お問い合わせ" })).toHaveAttribute("href", "#lab-contact");
     for (const internalLabel of ["Quotation Suite", "原価シミュレーター", "見積書発行", "見積履歴", "ユーザー管理"]) {
       expect(screen.queryByText(internalLabel)).not.toBeInTheDocument();
     }
+  });
+
+  it("uses the new quote draft form at #lab-quote and keeps the request form consultation-only", async () => {
+    render(await LabPage({ searchParams: Promise.resolve({}) }));
+
+    const quoteSection = document.querySelector("#lab-quote");
+    expect(quoteSection).toContainElement(screen.getByTestId("embedded-quote-draft-form"));
+    expect(quoteSection).toHaveTextContent("必要条件だけ入力して見積もりを開始");
+    expect(screen.queryByRole("heading", { name: "仕様を入力して価格を確認" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "お見積もり" })).not.toBeInTheDocument();
+    expect(document.querySelector("#lab-request-fields")).toBeInTheDocument();
   });
 
   it("explains production and quality conditions without hiding SPA's minimum", async () => {

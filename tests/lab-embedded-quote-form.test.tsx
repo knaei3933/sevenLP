@@ -30,7 +30,7 @@ describe("embedded G004 quote draft form", () => {
       "quantity",
     ]);
     expect(form.querySelector("input[name='locale']")).toHaveValue("ja");
-    expect(screen.getByRole("heading", { name: "条件だけ保存して後で再開" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "必要条件だけ入力して見積もりを開始" })).toBeInTheDocument();
 
     const source = await readFile(
       path.join(projectRoot, "src/app/lab/embedded-quote-draft-form.tsx"),
@@ -89,7 +89,7 @@ describe("embedded G004 quote draft form", () => {
   });
 
   it("keeps the existing consultation and sample form route intact", async () => {
-    render(await LabPage({ searchParams: Promise.resolve({}) }));
+    render(await LabPage({ searchParams: Promise.resolve({ requestType: "consultation" }) }));
     const consultationForm = document.querySelector("#lab-request-fields");
     expect(consultationForm).not.toBeNull();
     expect(screen.getByRole("tablist", { name: "依頼種別" })).toBeInTheDocument();

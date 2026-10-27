@@ -98,59 +98,19 @@ test("keeps /, /lab, and /lab/ anonymous and shows the Japanese public identity"
     const contact = page.getByRole("link", { name: "shapepouch@package-lab.com" });
     await expect(contact).toBeVisible();
     await expect(contact).toHaveAttribute("href", /mailto:shapepouch@package-lab\.com/);
-    await expect(page.getByRole("tab", { name: "お見積もり" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "ご相談" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "サンプル" })).toBeVisible();
+    await expect(page.getByTestId("embedded-quote-draft-form")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "必要条件だけ入力して見積もりを開始" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "お見積もり" })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Quotation Suite" })).toHaveCount(0);
   }
 });
 
-test("releases a quotation only after a valid lead submission", async ({ page }, testInfo) => {
-  const email = `g008-quote-${Date.now()}-${testInfo.project.name}@example.com`;
-  await page.goto("/lab");
-
-  await expect(page.getByTestId("lab-size")).toHaveValue("round-50x60");
-  await expect(page.getByTestId("pre-gate-price-notice")).toContainText("単価・総額は");
-  await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
-  await expect(page.locator("#lab-quote")).not.toContainText("¥");
-
-  await fillLead(page, email);
-  await page.getByTestId("lab-submit").click();
-  await expect(page.getByText("プライバシーポリシーへの同意は必須です。")).toBeVisible();
-  await expect(page.getByTestId("lab-consent")).toHaveAttribute("aria-invalid", "true");
-  await expect(page.getByTestId("released-grand-total")).toHaveCount(0);
-
-  await page.getByTestId("lab-size").selectOption("round-60x100");
-  await page.getByTestId("lab-quantity").fill("10000");
-  await page.getByTestId("lab-fill").fill("2.5");
-  await page.getByTestId("lab-chambers").selectOption("2");
-  await page.getByTestId("lab-filling-method").selectOption("hopper");
-  await page.getByTestId("lab-printing-method").selectOption("digital");
-  await page.getByTestId("lab-color-count").fill("4");
-  await page.getByTestId("lab-consent").check();
-
-  const responsePromise = page.waitForResponse(
-    (response) => response.url().includes(publicApiPath) && response.status() === 201,
-  );
-  await page.getByTestId("lab-submit").click();
-  const response = await responsePromise;
-  const payload = await response.json();
-  expect(Object.keys(payload)).toEqual(["quote"]);
-  const quote = payload.quote;
-  expect(Object.keys(quote).sort()).toEqual(quoteDtoKeys);
-  expect(quote.requestType).toBe("quotation");
-  expect(quote.grandTotal).toMatch(/^\d+(?:\.\d+)?$/);
-
-  await expect(page.getByTestId("quote-reference")).toHaveText(quote.reference);
-  await expect(page.getByTestId("released-grand-total")).toHaveText(`¥${quote.grandTotal}`);
-  await expect(page.getByTestId("lab-submit")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "お見積り条件を確認しました" })).toBeFocused();
-});
-
 test("accepts an anonymous consultation without releasing a quote", async ({ page }, testInfo) => {
   const email = `g008-consultation-${Date.now()}-${testInfo.project.name}@example.com`;
-  await page.goto("/lab");
-  await page.getByRole("tab", { name: "ご相談" }).click();
+  await page.goto("/lab?requestType=consultation#lab-request");
+  await expect(page.getByRole("tab", { name: "ご相談" })).toHaveAttribute("aria-selected", "true");
   await fillLead(page, email);
   await page.getByTestId("lab-message").fill("小ロットの充填条件を相談したいです。");
   await page.getByTestId("lab-consent").check();
@@ -163,8 +123,8 @@ test("accepts an anonymous consultation without releasing a quote", async ({ pag
 
 test("accepts an anonymous sample request without releasing a quote", async ({ page }, testInfo) => {
   const email = `g008-sample-${Date.now()}-${testInfo.project.name}@example.com`;
-  await page.goto("/lab");
-  await page.getByRole("tab", { name: "サンプル" }).click();
+  await page.goto("/lab?requestType=sample#lab-request");
+  await expect(page.getByRole("tab", { name: "サンプル" })).toHaveAttribute("aria-selected", "true");
   await fillLead(page, email);
   await page.getByTestId("lab-message").fill("サンプルを確認したいです。");
   await page.getByTestId("lab-consent").check();
@@ -179,7 +139,7 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
   await page.goto("/lab");
   const form = page.getByTestId("embedded-quote-draft-form");
   await expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
-  await expect(form.locator("select, input:not([type=hidden])")).toHaveCount(5);
+  await expect(form.locator("select, input:not([type=hidden])")).toHaveCount(9);
 
   const response = await page.request.post("http://127.0.0.1:3100/api/public/lab/quote-drafts", {
     maxRedirects: 0,
@@ -187,7 +147,7 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
     form: {
       colorCount: "2",
       designId: "rda",
-      fillAmount: "1.50",
+      fillAmount: "1",
       locale: "ja",
       quantity: "10000",
       sizeKey: "round-60x80",
@@ -195,7 +155,7 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
   });
   expect(response.status()).toBe(303);
   const location = response.headersArray().find((header) => header.name.toLowerCase() === "location")?.value;
-  expect(location).toMatch(/^http:\/\/127\.0\.0\.1:4400\/portal\/quotes\/new#quoteDraft=/);
+  expect(location).toMatch(/^http:\/\/(?:localhost|127\.0\.0\.1):4400\/portal\/quotes\/new#quoteDraft=/);
 
   const destination = new URL(location!);
   expect(destination.pathname).toBe("/portal/quotes/new");
@@ -205,7 +165,7 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
 });
 
 test("redirects protected internal pages to login", async ({ page }) => {
-  for (const pathname of ["/", "/quote", "/history", "/checklists/current", "/admin/users"]) {
+  for (const pathname of ["/quote", "/history", "/checklists/current", "/admin/users"]) {
     await page.goto(pathname);
     await expect(page).toHaveURL(new RegExp(`/login\\?next=${encodeURIComponent(pathname).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -213,20 +173,12 @@ test("redirects protected internal pages to login", async ({ page }) => {
 });
 
 test("passes basic keyboard, label, and mobile accessibility checks", async ({ page }, testInfo) => {
-  await page.goto("/lab");
-  await page.keyboard.press("Tab"); // skip link
-  await page.keyboard.press("Tab"); // header: products
-  await page.keyboard.press("Tab"); // header: estimate
-  await page.keyboard.press("Tab"); // header: quality
-  await page.keyboard.press("Tab"); // header: process
-  await page.keyboard.press("Tab"); // header: contact
-  await page.keyboard.press("Tab"); // primary estimate action
-  await page.keyboard.press("Tab"); // consultation action
-  await page.keyboard.press("Tab"); // product specification link
-  await page.keyboard.press("Tab"); // request-type tabs
-  await expect(page.getByRole("tab", { name: "お見積もり" })).toBeFocused();
+  await page.goto("/lab?requestType=sample#lab-request");
+  const sampleTab = page.getByRole("tab", { name: "サンプル" });
+  await sampleTab.focus();
+  await expect(sampleTab).toBeFocused();
 
-  const focusStyle = await page.getByRole("tab", { name: "お見積もり" }).evaluate((element) => {
+  const focusStyle = await sampleTab.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
       outlineWidth: style.outlineWidth,
@@ -237,11 +189,10 @@ test("passes basic keyboard, label, and mobile accessibility checks", async ({ p
   expect(parseFloat(focusStyle.outlineWidth)).toBeGreaterThanOrEqual(3);
   expect(focusStyle.outlineStyle).toBe("solid");
 
-  await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("tab", { name: "ご相談" })).toBeFocused();
-  await expect(page.getByRole("tab", { name: "ご相談" })).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("tab", { name: "お見積もり" })).toHaveAttribute("aria-selected", "true");
+  const consultationTab = page.getByRole("tab", { name: "ご相談" });
+  await expect(consultationTab).toBeFocused();
+  await expect(consultationTab).toHaveAttribute("aria-selected", "true");
 
   const unlabeledControls = await page
     .locator("input:not([type=hidden]), select, textarea")
@@ -313,7 +264,7 @@ test("captures shared LP design evidence at 390, 768, and 1440 pixels", async ({
   for (const width of widths) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : width === 768 ? 1024 : 900 });
     await page.goto("/lab");
-    await page.locator("#lab-quote-draft").scrollIntoViewIfNeeded();
+    await page.locator("#lab-quote").scrollIntoViewIfNeeded();
     await expect(page.getByTestId("embedded-quote-draft-form")).toBeVisible();
 
     const metrics = await page.evaluate(() => ({

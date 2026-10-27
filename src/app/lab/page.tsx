@@ -20,7 +20,7 @@ const heroSpecs = [
 
 const headerNavItems = [
   { href: "#lab-products", label: "製品仕様" },
-  { href: "#lab-quote", label: "見積もり" },
+  { href: "/lab#lab-quote", label: "見積もり" },
   { href: "#lab-quality", label: "品質体制" },
   { href: "#lab-process", label: "進め方" },
   { href: "#lab-contact", label: "お問い合わせ" },
@@ -245,17 +245,17 @@ type LabPageProps = {
   searchParams: Promise<{ requestType?: string }>;
 };
 
+type LabContactRequestType = "consultation" | "sample";
+
 export default async function LabPage({ searchParams }: LabPageProps) {
   const params = await searchParams;
-  const initialRequestType = params.requestType === "consultation"
-    ? "consultation"
-    : params.requestType === "sample"
-      ? "sample"
-      : "quotation";
+  const initialRequestType: LabContactRequestType = params.requestType === "sample"
+    ? "sample"
+    : "consultation";
 
   return (
     <>
-      <a className={styles.skipLink} href="#lab-quote">お見積もりフォームへ</a>
+      <a className={styles.skipLink} href="/lab#lab-quote">お見積もりフォームへ</a>
 
       <header className={styles.siteHeader}>
         <div className={styles.headerInner}>
@@ -288,10 +288,10 @@ export default async function LabPage({ searchParams }: LabPageProps) {
                 ラウンド・ボトル・チューブなど6形状を比較しながら、充填量・チャンバー・印刷条件を整理。お客様支給バルクを、日本語サポートで見積もり・サンプル依頼まで進められます。
               </p>
               <div className={styles.actions}>
-                <a className={styles.primaryAction} href="#lab-quote">
+                <a className={styles.primaryAction} href="/lab#lab-quote">
                   形状と数量を選んで見積もりを確認
                 </a>
-                <a className={styles.secondaryAction} href="?requestType=consultation#lab-quote-consultation">
+                <a className={styles.secondaryAction} href="?requestType=consultation#lab-request">
                   条件が未確定なら相談から始める
                 </a>
               </div>
@@ -434,51 +434,39 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </p>
         </section>
 
-        <section id="lab-quote" className={`${styles.section} ${styles.quoteSection}`} aria-labelledby="lab-quote-heading">
-          <div className={styles.quoteLayout}>
-            <div className={styles.quoteIntro}>
-              <p className={styles.sectionLabel}>見積もり｜ESTIMATE</p>
-              <h2 className={styles.sectionHeading} id="lab-quote-heading">仕様を入力して価格を確認</h2>
-              <p className={styles.sectionLead}>
-                サイズ・充填量・数量などの条件は、リード情報の送信前でも自由に組み合わせて確認できます。単価と総額は、会社情報とご連絡先、同意の確認後に表示します。
-              </p>
-              <ol className={styles.quoteGuide}>
-                <li>
-                  <strong>仕様の入力</strong>
-                  <span>形状・充填量・チャンバー・印刷・数量を整理します。</span>
-                </li>
-                <li>
-                  <strong>価格表示の条件</strong>
-                  <span>会社名・お名前・連絡先・同意を送信します。</span>
-                </li>
-                <li>
-                  <strong>相談のみでも可</strong>
-                  <span>ご相談・サンプル依頼も同じフォームから送れます。</span>
-                </li>
-              </ol>
-            </div>
-            <div id="lab-quote-consultation" className={styles.quoteForm}>
-              <LabRequestForm initialRequestType={initialRequestType} />
-            </div>
+        <section
+          id="lab-quote"
+          className={`${styles.section} ${styles.quoteSection}`}
+          aria-labelledby="lab-quote-heading"
+        >
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>見積もり｜ESTIMATE</p>
+            <h2 className={styles.sectionHeading} id="lab-quote-heading">
+              必要条件だけ入力して見積もりを開始
+            </h2>
+            <p className={styles.sectionLead}>
+              充填量・形状・サイズ・色数・数量を選ぶと、会員登録後に印刷方法の候補を選んで正式見積もりへ進めます。
+            </p>
+          </div>
+          <div className={styles.quoteForm}>
+            <EmbeddedQuoteDraftForm />
           </div>
         </section>
 
-        <section
-          id="lab-quote-draft"
-          className={`${styles.section} ${styles.quoteSection}`}
-          aria-labelledby="lab-quote-draft-heading"
-        >
+        <section id="lab-request" className={`${styles.section} ${styles.quoteSection}`} aria-labelledby="lab-request-heading">
           <div className={styles.quoteForm}>
             <div className={styles.sectionHead}>
-              <p className={styles.sectionLabel}>下書き｜DRAFT</p>
-              <h2 className={styles.sectionHeading} id="lab-quote-draft-heading">
-                条件だけ保存して後で再開
+              <p className={styles.sectionLabel}>サンプル・ご相談｜REQUEST</p>
+              <h2 className={styles.sectionHeading} id="lab-request-heading">
+                条件が未確定なら相談から進める
               </h2>
               <p className={styles.sectionLead}>
-                連絡先を送らずに仕様の下書きを発行できます。発行URLは60分間だけ有効です。
+                正式見積もりの条件がまだ固まらない場合は、内容物・用途・希望時期をご相談ください。
               </p>
             </div>
-            <EmbeddedQuoteDraftForm />
+            <div id="lab-quote-consultation">
+              <LabRequestForm initialRequestType={initialRequestType} />
+            </div>
           </div>
         </section>
 
@@ -540,7 +528,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
             ))}
           </ul>
           <div className={styles.sectionActions}>
-            <a className={styles.buttonPrimary} href="#lab-quote">用途を相談する</a>
+            <a className={styles.buttonPrimary} href="?requestType=consultation#lab-request">用途を相談する</a>
           </div>
         </section>
 
@@ -587,7 +575,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               </p>
             </div>
             <div className={styles.contactActions}>
-              <a className={styles.buttonInverse} href="#lab-quote">見積条件を入力する</a>
+              <a className={styles.buttonInverse} href="/lab#lab-quote">見積条件を入力する</a>
               <a className={styles.contactLink} href="mailto:shapepouch@package-lab.com?subject=サンプル・ご相談">
                 shapepouch@package-lab.com
               </a>
@@ -608,7 +596,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           <nav aria-label="フッターナビゲーション">
             <ul className={styles.footerNav}>
               <li><a href="#lab-products">製品仕様</a></li>
-              <li><a href="#lab-quote">見積もり</a></li>
+              <li><a href="/lab#lab-quote">見積もり</a></li>
               <li><a href="#lab-quality">品質体制</a></li>
               <li><a href="#lab-process">進め方</a></li>
               <li><a href="#lab-contact">お問い合わせ</a></li>
