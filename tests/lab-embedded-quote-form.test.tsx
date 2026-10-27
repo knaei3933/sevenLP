@@ -13,20 +13,20 @@ const projectRoot = path.resolve(import.meta.dirname, "..");
 
 afterEach(cleanup);
 
-describe("embedded G004 quote draft form", () => {
-  it("DRAFT-008A exposes five constrained customer fields and posts only to the draft route", async () => {
+describe("embedded quote form", () => {
+  it("exposes constrained customer fields and posts only to the draft route", async () => {
     render(await LabPage({ searchParams: Promise.resolve({}) }));
     const form = screen.getByTestId("embedded-quote-draft-form");
 
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
-    const visibleFields = form.querySelectorAll("select, input:not([type='hidden'])");
-    expect(visibleFields).toHaveLength(9);
-    expect([...visibleFields].map((field) => field.getAttribute("name"))).toEqual([
+    const fields = form.querySelectorAll("input:not([type='hidden'])");
+    expect(fields).toHaveLength(28);
+    expect([...fields].map((field) => field.getAttribute("name"))).toEqual([
       ...Array.from({ length: 5 }, () => "fillAmount"),
-      "designId",
-      "sizeKey",
-      "colorCount",
+      ...Array.from({ length: 4 }, () => "designId"),
+      ...Array.from({ length: 8 }, () => "sizeKey"),
+      ...Array.from({ length: 10 }, () => "colorCount"),
       "quantity",
     ]);
     expect(form.querySelector("input[name='locale']")).toHaveValue("ja");
@@ -39,6 +39,7 @@ describe("embedded G004 quote draft form", () => {
     expect(source).toContain("/api/public/lab/quote-drafts");
     expect(source).not.toMatch(/fetch\s*\(/);
     expect(source).not.toMatch(/printingMethod/);
+    expect(source).not.toContain("署名付き下書きトークン");
     expect(source).not.toMatch(/\/api\/public\/lab\/requests|\/api\/calculate/);
     expect(source).not.toMatch(/POUCH_QUOTE_DRAFT_SIGNING_KEY|node:crypto/);
   });
@@ -48,42 +49,39 @@ describe("embedded G004 quote draft form", () => {
     render(<EmbeddedQuoteDraftForm />);
     const form = screen.getByTestId("embedded-quote-draft-form");
     const fillGroup = within(form).getByTestId("quote-draft-fill-options");
-    expect(form).toHaveTextContent("充填量に対応しないデザイン・サイズは選択できません。");
     expect(fillGroup).toHaveTextContent("1g");
     expect(fillGroup).toHaveTextContent("2g");
     expect(fillGroup).toHaveTextContent("3g");
     expect(fillGroup).toHaveTextContent("5g");
     expect(fillGroup).toHaveTextContent("10g");
+    expect(within(form).getByTestId("quote-draft-fill-help"))
+      .toHaveTextContent("充填量に対応しないデザイン・サイズは自動的に選択できなくなります。");
 
     await user.click(within(form).getByRole("radio", { name: "5g" }));
-    const design = within(form).getByLabelText("デザイン") as HTMLSelectElement;
-    const craOption = [...design.options].find((option) => option.value === "cra");
-    expect(craOption).toHaveTextContent("5g非対応");
-    expect(craOption).toBeDisabled();
-    expect(within(form).getByTestId("quote-draft-size")).toHaveValue("round-50x60");
+    const craCard = within(form).getByRole("radio", { name: /丸形（CRA）/ });
+    expect(craCard).toBeDisabled();
+    expect(craCard.closest("label")).toHaveTextContent("5g非対応");
+    expect(within(form).getByRole("radio", { name: "ラウンド 50×60" })).toBeChecked();
 
     await user.click(within(form).getByRole("radio", { name: "2g" }));
-    expect(within(form).getByTestId("quote-draft-size")).toHaveValue("round-50x60");
+    expect(within(form).getByRole("radio", { name: "ラウンド 50×60" })).toBeChecked();
   });
 
   it("constrains size and quantity by the selected design", async () => {
     const user = userEvent.setup();
     render(<EmbeddedQuoteDraftForm />);
     const form = screen.getByTestId("embedded-quote-draft-form");
-
-    const design = within(form).getByLabelText("デザイン");
-    const size = within(form).getByLabelText("サイズ");
     const quantity = within(form).getByLabelText(/希望数量/);
-    expect(size).toHaveValue("round-50x60");
+
+    const designRadios = within(form).getAllByRole("radio", { name: /（(?:RDA|TUA|BTA|CRA)）/ });
+    expect(designRadios.map((radio) => radio.getAttribute("value"))).toEqual([
+      "rda", "tua", "bta", "cra",
+    ]);
+    expect(within(form).getByRole("radio", { name: "ラウンド 50×60" })).toBeChecked();
     expect(quantity).toHaveValue(10_000);
 
-    const designValues = [...(design as HTMLSelectElement).options].map((option) => option.value);
-    expect(designValues).toEqual(["rda", "tua", "bta", "cra"]);
-    expect(designValues).not.toContain("spa");
-    expect(designValues).not.toContain("xra");
-    expect(designValues).not.toContain("mow");
-    await user.selectOptions(design, "cra");
-    expect(size).toHaveValue("circle-70x70");
+    await user.click(within(form).getByRole("radio", { name: /丸形（CRA）/ }));
+    expect(within(form).getByRole("radio", { name: "丸形 70×70" })).toBeChecked();
     expect(quantity).toHaveValue(10_000);
     expect(quantity).toHaveAttribute("max", "5000000");
   });

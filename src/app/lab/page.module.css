@@ -725,6 +725,304 @@
   box-shadow: var(--lp-shadow-raised);
 }
 
+.quoteFormShell {
+  display: grid;
+  gap: 24px;
+  width: min(900px, 100%);
+  margin: 0 auto;
+  border: var(--lp-border);
+  border-top: 4px solid var(--lp-brand);
+  border-radius: var(--lp-radius-large);
+  background: #fff;
+  padding: clamp(18px, 4vw, 32px);
+  box-shadow: var(--lp-shadow-raised);
+}
+
+.selectionSummary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--lp-radius-md);
+  background: var(--lp-brand-deep);
+  padding: 14px;
+}
+
+.summaryValue {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  padding: 4px 12px;
+  font-family: var(--font-noto-sans-mono), monospace;
+  font-size: .78rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepField {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.stepLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--lp-ink);
+  padding: 0;
+  font-size: .95rem;
+  font-weight: 800;
+}
+
+.stepNumber {
+  color: var(--lp-brand-text);
+  font-family: var(--font-noto-sans-mono), monospace;
+  font-size: .74rem;
+  font-weight: 750;
+}
+
+.stepHelp {
+  margin: 0;
+  color: var(--lp-muted);
+  font-size: .82rem;
+  line-height: 1.55;
+}
+
+.visualHiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid var(--lp-line-strong);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lp-ink);
+  padding: 12px 18px;
+  font-size: .88rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: border-color .18s var(--sp-motion-ease), background-color .18s var(--sp-motion-ease), box-shadow .18s var(--sp-motion-ease);
+}
+
+.chip:hover,
+.chip:has(input:not(:disabled):hover) {
+  border-color: var(--lp-brand);
+}
+
+.chipSelected,
+.chip:has(input:checked) {
+  border-color: var(--lp-brand);
+  background: var(--lp-canvas-soft);
+  box-shadow: inset 0 0 0 1px var(--lp-brand), 0 4px 12px rgba(142, 63, 69, .08);
+  color: var(--lp-brand-deep);
+}
+
+.chip:has(input:focus-visible) {
+  outline: 3px solid var(--lp-focus);
+  outline-offset: 2px;
+}
+
+.chipDisabled,
+.chip:has(input:disabled) {
+  border-color: var(--lp-line);
+  background: var(--lp-mist);
+  color: var(--lp-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.designGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.designCard {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 156px;
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--lp-radius-md);
+  background: #fff;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s var(--sp-motion-ease), box-shadow .18s var(--sp-motion-ease), transform .18s var(--sp-motion-ease);
+}
+
+.designCard:hover,
+.designCard:has(input:not(:disabled):hover) {
+  border-color: var(--lp-brand);
+  box-shadow: 0 10px 24px rgba(142, 63, 69, .10);
+  transform: translateY(-2px);
+}
+
+.designCardSelected,
+.designCard:has(input:checked) {
+  border-color: var(--lp-brand);
+  background: var(--lp-canvas-soft);
+  box-shadow: inset 0 0 0 1px var(--lp-brand), 0 10px 24px rgba(142, 63, 69, .10);
+}
+
+.designCard:has(input:focus-visible) {
+  outline: 3px solid var(--lp-focus);
+  outline-offset: 2px;
+}
+
+.designMedia {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 52px;
+}
+
+.designMedia img {
+  object-fit: contain;
+}
+
+.designCode {
+  color: var(--lp-brand-text);
+  font-family: var(--font-noto-sans-mono), monospace;
+  font-size: .74rem;
+  font-weight: 750;
+  letter-spacing: .08em;
+}
+
+.designName {
+  color: var(--lp-ink);
+  font-size: .84rem;
+  font-weight: 750;
+}
+
+.designDisabledNote {
+  color: var(--lp-muted);
+  font-size: .74rem;
+}
+
+.conditionColumns {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 720px) {
+  .designGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .conditionColumns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.smallChipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.smallChip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--lp-radius-sm);
+  background: #fff;
+  font-size: .85rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.smallChip:hover {
+  border-color: var(--lp-brand);
+}
+
+.smallChip.chipSelected,
+.smallChip:has(input:checked) {
+  border-color: var(--lp-brand);
+  background: var(--lp-canvas-soft);
+  color: var(--lp-brand-deep);
+  box-shadow: inset 0 0 0 1px var(--lp-brand);
+}
+
+.smallChip:has(input:focus-visible) {
+  outline: 3px solid var(--lp-focus);
+  outline-offset: 2px;
+}
+
+.quantityInput {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--lp-radius-sm);
+  background: #fff;
+  color: var(--lp-ink);
+  font: inherit;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  padding: 13px 14px;
+}
+
+.quantityInput:hover {
+  border-color: var(--lp-brand);
+}
+
+.quickQuantity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quickButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--lp-line-strong);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lp-ink);
+  padding: 10px 13px;
+  font-size: .82rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color .18s var(--sp-motion-ease), background-color .18s var(--sp-motion-ease);
+}
+
+.quickButton:hover {
+  border-color: var(--lp-brand);
+  background: var(--lp-canvas-soft);
+}
+
 .tabs {
   display: grid;
   grid-auto-columns: 1fr;

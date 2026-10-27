@@ -139,7 +139,7 @@ test("issues a guest quote draft transport redirect in a URL fragment", async ({
   await page.goto("/lab");
   const form = page.getByTestId("embedded-quote-draft-form");
   await expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
-  await expect(form.locator("select, input:not([type=hidden])")).toHaveCount(9);
+  await expect(form.locator("input:not([type=hidden])")).toHaveCount(28);
 
   const response = await page.request.post("http://127.0.0.1:3100/api/public/lab/quote-drafts", {
     maxRedirects: 0,
