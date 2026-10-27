@@ -6,6 +6,14 @@ import type {
   PublicLabRequestType,
   PublicLabSizeKey,
 } from "./public-lab-options";
+import {
+  publicLabConsultationTopics,
+  publicLabDevelopmentStageOptions,
+  publicLabDesiredTimingOptions,
+  publicLabPlannedQuantityOptions,
+  publicLabSampleShapes,
+  publicLabSampleTypes,
+} from "./public-lab-options";
 
 export const PUBLIC_LAB_CONSENT_VERSION = "public-lab-privacy-v1" as const;
 
@@ -23,6 +31,7 @@ export type PublicLabFieldErrorCode =
   | "invalidInteger"
   | "tooManyDecimalPlaces"
   | "outOfRange"
+  | "requiredField"
   | "mustBeAccepted"
   | "mustBeEmpty"
   | "mustBeTrue";
@@ -59,11 +68,32 @@ export interface PublicLabQuotationRequest extends PublicLabRequestLead, PublicL
 
 export interface PublicLabConsultationRequest extends PublicLabRequestLead, PublicLabRequestConsent {
   requestType: "consultation";
+  inquiryTopic: string;
+  productCategory: string;
+  useCase: string;
+  developmentStage: string;
+  plannedQuantity: string;
+  desiredTiming: string;
   message?: string;
 }
 
 export interface PublicLabSampleRequest extends PublicLabRequestLead, PublicLabRequestConsent {
   requestType: "sample";
+  sampleShapes: string[];
+  sampleType: string;
+  sampleQuantity: number;
+  productName: string;
+  productCategory: string;
+  useCase: string;
+  plannedQuantity: string;
+  desiredTiming: string;
+  recipientName: string;
+  postalCode: string;
+  prefecture: string;
+  addressLine1: string;
+  addressLine2?: string;
+  deliveryPhone: string;
+  deliveryNotes?: string;
   message?: string;
 }
 
@@ -114,6 +144,32 @@ const COMMON_FIELDS = [
   "consentAccepted",
   "honeypot",
 ] as const;
+const CONSULTATION_FIELDS = [
+  "inquiryTopic",
+  "productCategory",
+  "useCase",
+  "developmentStage",
+  "plannedQuantity",
+  "desiredTiming",
+] as const;
+const SAMPLE_FIELDS = [
+  "sampleShapes",
+  "sampleType",
+  "sampleQuantity",
+  "productName",
+  "productCategory",
+  "useCase",
+  "plannedQuantity",
+  "desiredTiming",
+  "recipientName",
+  "postalCode",
+  "prefecture",
+  "addressLine1",
+  "addressLine2",
+  "deliveryPhone",
+  "deliveryNotes",
+] as const;
+const POSTAL_CODE_PATTERN = /^\d{3}-?\d{4}$/;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object"
@@ -165,6 +221,8 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
   const allowedFields = new Set<string>(COMMON_FIELDS);
   if (requestType === "quotation") {
     for (const field of TECHNICAL_FIELDS) allowedFields.add(field);
+  } else {
+    for (const field of [...CONSULTATION_FIELDS, ...SAMPLE_FIELDS]) allowedFields.add(field);
   }
 
   const errors: PublicLabFieldError[] = [];
@@ -294,11 +352,125 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
     };
   }
 
+  if (requestType === "consultation") {
+    const inquiryTopic = validateRequiredText(input, "inquiryTopic", 100, errors);
+    if (inquiryTopic !== undefined && !isEnumValue(
+      inquiryTopic,
+      publicLabConsultationTopics.map((option) => option.value),
+    )) errors.push({ field: "inquiryTopic", code: "invalidValue" });
+
+    const productCategory = validateRequiredText(input, "productCategory", 100, errors);
+    const useCase = validateRequiredText(input, "useCase", 200, errors);
+    const developmentStage = validateRequiredEnum(
+      input,
+      "developmentStage",
+      publicLabDevelopmentStageOptions.map((option) => option.value),
+      errors,
+    );
+    const plannedQuantity = validateRequiredEnum(
+      input,
+      "plannedQuantity",
+      publicLabPlannedQuantityOptions.map((option) => option.value),
+      errors,
+    );
+    const desiredTiming = validateRequiredEnum(
+      input,
+      "desiredTiming",
+      publicLabDesiredTimingOptions.map((option) => option.value),
+      errors,
+    );
+    if (errors.length > 0) return { success: false, errors };
+
+    return {
+      success: true,
+      data: {
+        requestType,
+        ...lead,
+        inquiryTopic: inquiryTopic!,
+        productCategory: productCategory!,
+        useCase: useCase!,
+        developmentStage: developmentStage!,
+        plannedQuantity: plannedQuantity!,
+        desiredTiming: desiredTiming!,
+        ...(message === undefined ? {} : { message }),
+        ...consent,
+      },
+    };
+  }
+
+  const sampleShapes = validateEnumArray(
+    input,
+    "sampleShapes",
+    publicLabSampleShapes.map((option) => option.value),
+    errors,
+  );
+  const sampleType = validateRequiredEnum(
+    input,
+    "sampleType",
+    publicLabSampleTypes.map((option) => option.value),
+    errors,
+  );
+  let sampleQuantity: number | undefined;
+  if (typeof input.sampleQuantity !== "number" || !Number.isInteger(input.sampleQuantity)) {
+    errors.push({ field: "sampleQuantity", code: "invalidInteger" });
+  } else if (input.sampleQuantity < 1 || input.sampleQuantity > 20) {
+    errors.push({ field: "sampleQuantity", code: "outOfRange" });
+  } else {
+    sampleQuantity = input.sampleQuantity;
+  }
+
+  const productName = validateRequiredText(input, "productName", 100, errors);
+  const productCategory = validateRequiredText(input, "productCategory", 100, errors);
+  const useCase = validateRequiredText(input, "useCase", 200, errors);
+  const plannedQuantity = validateRequiredEnum(
+    input,
+    "plannedQuantity",
+    publicLabPlannedQuantityOptions.map((option) => option.value),
+    errors,
+  );
+  const desiredTiming = validateRequiredEnum(
+    input,
+    "desiredTiming",
+    publicLabDesiredTimingOptions.map((option) => option.value),
+    errors,
+  );
+  const recipientName = validateRequiredText(input, "recipientName", 100, errors);
+  let postalCode = validateRequiredText(input, "postalCode", 8, errors);
+  if (postalCode !== undefined && !POSTAL_CODE_PATTERN.test(postalCode)) {
+    errors.push({ field: "postalCode", code: "invalidValue" });
+  } else if (postalCode !== undefined) {
+    postalCode = postalCode.replace(/^(\d{3})(\d{4})$/, "$1-$2");
+  }
+  const prefecture = validateRequiredText(input, "prefecture", 20, errors);
+  const addressLine1 = validateRequiredText(input, "addressLine1", 200, errors);
+  const addressLine2 = validateOptionalText(input, "addressLine2", 200, errors);
+  const deliveryPhone = validateRequiredText(input, "deliveryPhone", 30, errors);
+  if (deliveryPhone !== undefined && !isValidPhone(deliveryPhone)) {
+    errors.push({ field: "deliveryPhone", code: "invalidPhone" });
+  }
+  const deliveryNotes = validateOptionalText(input, "deliveryNotes", 500, errors);
+  if (errors.length > 0) return { success: false, errors };
+
   return {
     success: true,
     data: {
       requestType,
       ...lead,
+      sampleShapes: sampleShapes!,
+      sampleType: sampleType!,
+      sampleQuantity: sampleQuantity!,
+      productName: productName!,
+      productCategory: productCategory!,
+      useCase: useCase!,
+      plannedQuantity: plannedQuantity!,
+      desiredTiming: desiredTiming!,
+      recipientName: recipientName!,
+      postalCode: postalCode!,
+      prefecture: prefecture!,
+      addressLine1: addressLine1!,
+      ...(addressLine2 === undefined ? {} : { addressLine2 }),
+      deliveryPhone: deliveryPhone!,
+      ...(deliveryNotes === undefined ? {} : { deliveryNotes }),
       ...(message === undefined ? {} : { message }),
       ...consent,
     },
@@ -363,6 +535,75 @@ function validateQuotationTechnicalFields(
 
 function isEnumValue<TValue extends string>(value: unknown, values: readonly TValue[]): value is TValue {
   return typeof value === "string" && (values as readonly string[]).includes(value);
+}
+
+function validateRequiredText(
+  input: Record<string, unknown>,
+  field: string,
+  maxLength: number,
+  errors: PublicLabFieldError[],
+): string | undefined {
+  const value = validateOptionalText(input, field, maxLength, errors);
+  if (value === undefined) errors.push({ field, code: "requiredField" });
+  return value;
+}
+
+function validateOptionalText(
+  input: Record<string, unknown>,
+  field: string,
+  maxLength: number,
+  errors: PublicLabFieldError[],
+): string | undefined {
+  if (!(field in input) || input[field] === undefined) return undefined;
+  if (!isText(input[field])) {
+    errors.push({ field, code: "invalidType" });
+    return undefined;
+  }
+  const value = input[field].trim();
+  if (hasControlCharacter(value)) {
+    errors.push({ field, code: "controlCharacter" });
+    return undefined;
+  }
+  if (value.length < 1) {
+    errors.push({ field, code: "requiredField" });
+    return undefined;
+  }
+  if (value.length > maxLength) {
+    errors.push({ field, code: "tooLong" });
+    return undefined;
+  }
+  return value;
+}
+
+function validateRequiredEnum<TValue extends string>(
+  input: Record<string, unknown>,
+  field: string,
+  values: readonly TValue[],
+  errors: PublicLabFieldError[],
+): TValue | undefined {
+  if (!isEnumValue(input[field], values)) {
+    errors.push({ field, code: "requiredField" });
+    return undefined;
+  }
+  return input[field];
+}
+
+function validateEnumArray<TValue extends string>(
+  input: Record<string, unknown>,
+  field: string,
+  values: readonly TValue[],
+  errors: PublicLabFieldError[],
+): TValue[] | undefined {
+  if (!Array.isArray(input[field]) || input[field].length < 1 || input[field].length > values.length) {
+    errors.push({ field, code: "requiredField" });
+    return undefined;
+  }
+  const unique = [...new Set(input[field])];
+  if (unique.length !== input[field].length || !unique.every((value) => isEnumValue(value, values))) {
+    errors.push({ field, code: "invalidValue" });
+    return undefined;
+  }
+  return input[field] as TValue[];
 }
 
 function isPublicLabSizeKey(value: string): boolean {

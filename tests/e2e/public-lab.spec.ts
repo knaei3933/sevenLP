@@ -31,6 +31,20 @@ async function fillLead(page: Page, email: string) {
   await page.getByTestId("lab-phone").fill("03-0000-0000");
 }
 
+async function fillSharedConditions(page: Page) {
+  await page.getByTestId("lab-product-category").fill("スキンケア");
+  await page.getByTestId("lab-use-case").fill("新製品サンプル");
+}
+
+async function fillSampleDelivery(page: Page) {
+  await page.getByTestId("lab-product-name").fill("保湿美容液");
+  await page.getByTestId("lab-recipient-name").fill("サンプル受取太郎");
+  await page.getByTestId("lab-postal-code").fill("150-0001");
+  await page.getByTestId("lab-prefecture").fill("東京都");
+  await page.getByTestId("lab-address-line1").fill("渋谷区テスト1-2-3");
+  await page.getByTestId("lab-delivery-phone").fill("03-0000-0000");
+}
+
 async function semanticAccessibilityEvidence(page: Page) {
   return page.evaluate(() => {
     const channels = (value: string) => {
@@ -112,6 +126,7 @@ test("accepts an anonymous consultation without releasing a quote", async ({ pag
   await page.goto("/lab?requestType=consultation#lab-request");
   await expect(page.getByRole("tab", { name: "ご相談" })).toHaveAttribute("aria-selected", "true");
   await fillLead(page, email);
+  await fillSharedConditions(page);
   await page.getByTestId("lab-message").fill("小ロットの充填条件を相談したいです。");
   await page.getByTestId("lab-consent").check();
   await page.getByTestId("lab-submit").click();
@@ -126,6 +141,8 @@ test("accepts an anonymous sample request without releasing a quote", async ({ p
   await page.goto("/lab?requestType=sample#lab-request");
   await expect(page.getByRole("tab", { name: "サンプル" })).toHaveAttribute("aria-selected", "true");
   await fillLead(page, email);
+  await fillSharedConditions(page);
+  await fillSampleDelivery(page);
   await page.getByTestId("lab-message").fill("サンプルを確認したいです。");
   await page.getByTestId("lab-consent").check();
   await page.getByTestId("lab-submit").click();

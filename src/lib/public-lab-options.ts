@@ -45,6 +45,58 @@ export const publicLabRequestTypeOptions = [
   { value: "sample", label: "サンプル" },
 ] as const satisfies readonly PublicLabEnumOption<PublicLabRequestType>[];
 
+export type PublicLabDevelopmentStage = "idea" | "development" | "mass_production" | "other";
+export type PublicLabPlannedQuantity = "undetermined" | "under_5000" | "5000_10000" | "10001_50000" | "over_50000";
+export type PublicLabDesiredTiming = "undetermined" | "within_1m" | "within_3m" | "within_6m" | "over_6m";
+
+export const publicLabConsultationTopics = [
+  { value: "shape_size", label: "形状・サイズ選定" },
+  { value: "filling_spec", label: "充填量・内容物性状" },
+  { value: "printing_design", label: "印刷・デザイン" },
+  { value: "cost_lot", label: "コスト・ロット" },
+  { value: "schedule_process", label: "納期・進行" },
+  { value: "other", label: "その他" },
+] as const satisfies readonly PublicLabEnumOption<string>[];
+
+export const publicLabSampleShapes = [
+  { value: "rda", label: "RDA ラウンド" },
+  { value: "tua", label: "TUA チューブ" },
+  { value: "bta", label: "BTA ボトル型" },
+  { value: "cra", label: "CRA 丸形" },
+  { value: "spa", label: "SPA スポイトボトル" },
+  { value: "xra", label: "XRA スリムドーズ" },
+] as const satisfies readonly PublicLabEnumOption<string>[];
+
+export const publicLabSampleTypes = [
+  { value: "blank_pouch", label: "ブランクパウチ" },
+  { value: "filled_sample", label: "充填サンプル" },
+  { value: "printed_mockup", label: "印刷イメージ確認用" },
+  { value: "other", label: "その他" },
+] as const satisfies readonly PublicLabEnumOption<string>[];
+
+export const publicLabDevelopmentStageOptions = [
+  { value: "idea", label: "アイデア段階" },
+  { value: "development", label: "開発中" },
+  { value: "mass_production", label: "量産移行検討" },
+  { value: "other", label: "その他" },
+] as const satisfies readonly PublicLabEnumOption<PublicLabDevelopmentStage>[];
+
+export const publicLabPlannedQuantityOptions = [
+  { value: "undetermined", label: "未定" },
+  { value: "under_5000", label: "〜5,000枚" },
+  { value: "5000_10000", label: "5,000〜10,000枚" },
+  { value: "10001_50000", label: "10,001〜50,000枚" },
+  { value: "over_50000", label: "50,001枚〜" },
+] as const satisfies readonly PublicLabEnumOption<PublicLabPlannedQuantity>[];
+
+export const publicLabDesiredTimingOptions = [
+  { value: "undetermined", label: "未定" },
+  { value: "within_1m", label: "1ヶ月以内" },
+  { value: "within_3m", label: "3ヶ月以内" },
+  { value: "within_6m", label: "6ヶ月以内" },
+  { value: "over_6m", label: "6ヶ月以降" },
+] as const satisfies readonly PublicLabEnumOption<PublicLabDesiredTiming>[];
+
 export const publicLabFillingMethodOptions = [
   { value: "hopper", label: "ホッパ充填" },
   { value: "pressure", label: "加圧充填" },

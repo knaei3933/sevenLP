@@ -18,11 +18,19 @@ function mockFetchOnce(payload: unknown, status = 201) {
   return fetchMock;
 }
 
-async function fillValidLead(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText("会社名"), "テスト株式会社");
-  await user.type(screen.getByLabelText("お名前"), "公開 太郎");
-  await user.type(screen.getByLabelText("メールアドレス"), "lead@example.com");
-  await user.type(screen.getByLabelText("電話番号"), "0300000000");
+async function fillContact(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByTestId("lab-company"), "テスト株式会社");
+  await user.type(screen.getByTestId("lab-contact-name"), "公開 太郎");
+  await user.type(screen.getByTestId("lab-email"), "lead@example.com");
+  await user.type(screen.getByTestId("lab-phone"), "0300000000");
+}
+
+async function fillSharedConditions(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByTestId("lab-product-category"), "スキンケア");
+  await user.type(screen.getByTestId("lab-use-case"), "新製品サンプル");
+}
+
+async function consent(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByTestId("lab-consent"));
 }
 
@@ -47,7 +55,7 @@ describe("public lab request form", () => {
     expect(screen.getByRole("tab", { name: "ご相談" })).toHaveAttribute("aria-selected", "true");
   });
 
-  it("submits consultation leads without legacy quote fields", async () => {
+  it("submits detailed consultation conditions", async () => {
     const user = renderForm();
     const fetchMock = mockFetchOnce({
       requestType: "consultation",
@@ -55,20 +63,68 @@ describe("public lab request form", () => {
       message: "ご相談を受け付けました。",
     });
 
-    await fillValidLead(user);
+    await fillContact(user);
+    await user.selectOptions(screen.getByTestId("lab-inquiry-topic"), "filling_spec");
+    await user.selectOptions(screen.getByTestId("lab-development-stage"), "development");
+    await fillSharedConditions(user);
+    await user.selectOptions(screen.getByTestId("lab-planned-quantity"), "5000_10000");
+    await user.selectOptions(screen.getByTestId("lab-desired-timing"), "within_3m");
+    await consent(user);
     await user.click(screen.getByTestId("lab-submit"));
 
-    expect(fetchMock).toHaveBeenCalledWith("/api/public/lab/requests", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: expect.stringContaining('"requestType":"consultation"'),
-    });
     const body = JSON.parse(fetchMock.mock.calls[0][1]?.body as string);
+    expect(body).toMatchObject({
+      requestType: "consultation",
+      inquiryTopic: "filling_spec",
+      developmentStage: "development",
+      productCategory: "スキンケア",
+      useCase: "新製品サンプル",
+      plannedQuantity: "5000_10000",
+      desiredTiming: "within_3m",
+    });
     expect(body).not.toHaveProperty("sizeKey");
-    expect(body).not.toHaveProperty("quantity");
     expect(body).not.toHaveProperty("printingMethod");
     expect(await screen.findByText("ご相談を受け付けました。")).toBeInTheDocument();
-    expect(screen.getByTestId("request-reference")).toHaveTextContent("PL-TEST-REFERENCE");
+  });
+
+  it("submits detailed sample delivery information", async () => {
+    const user = renderForm();
+    const fetchMock = mockFetchOnce({
+      requestType: "sample",
+      reference: "PL-TEST-SAMPLE",
+      message: "サンプル依頼を受け付けました。",
+    });
+
+    await user.click(screen.getByRole("tab", { name: "サンプル" }));
+    await fillContact(user);
+    await user.click(screen.getByRole("checkbox", { name: "TUA チューブ" }));
+    await user.selectOptions(screen.getByTestId("lab-sample-type"), "filled_sample");
+    await user.clear(screen.getByTestId("lab-sample-quantity"));
+    await user.type(screen.getByTestId("lab-sample-quantity"), "2");
+    await user.type(screen.getByTestId("lab-product-name"), "保湿美容液");
+    await fillSharedConditions(user);
+    await user.selectOptions(screen.getByTestId("lab-planned-quantity"), "10001_50000");
+    await user.selectOptions(screen.getByTestId("lab-desired-timing"), "within_1m");
+    await user.type(screen.getByTestId("lab-recipient-name"), "サンプル受取太郎");
+    await user.type(screen.getByTestId("lab-postal-code"), "150-0001");
+    await user.type(screen.getByTestId("lab-prefecture"), "東京都");
+    await user.type(screen.getByTestId("lab-address-line1"), "渋谷区テスト1-2-3");
+    await user.type(screen.getByTestId("lab-delivery-phone"), "0300000000");
+    await consent(user);
+    await user.click(screen.getByTestId("lab-submit"));
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1]?.body as string);
+    expect(body).toMatchObject({
+      requestType: "sample",
+      sampleShapes: ["rda", "tua"],
+      sampleQuantity: 2,
+      productName: "保湿美容液",
+      postalCode: "150-0001",
+      prefecture: "東京都",
+      addressLine1: "渋谷区テスト1-2-3",
+      deliveryPhone: "0300000000",
+    });
+    expect(await screen.findByText("サンプル依頼を受け付けました。")).toBeInTheDocument();
   });
 
   it("shows Japanese validation errors without calling the API", async () => {

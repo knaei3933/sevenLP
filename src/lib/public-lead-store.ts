@@ -108,6 +108,7 @@ export interface PublicLeadPrivateRecord extends PublicLeadSummary {
   contactName: string;
   email: string;
   phone: string;
+  detailJson: string | null;
   message: string | null;
   consentVersion: string;
   consentAt: string;
@@ -135,6 +136,7 @@ interface LeadRow {
   contact_name: string;
   email: string;
   phone: string;
+  detail_json: string | null;
   message: string | null;
   consent_version: string;
   consent_at: string;
@@ -185,17 +187,19 @@ export async function savePublicLead(
   }
   const db = await getDatabase();
   const createdAt = toIsoDate(options.createdAt ?? new Date());
+  const detailJson = JSON.stringify(validatedRequest);
 
   for (let attempt = 1; attempt <= MAX_REFERENCE_ATTEMPTS; attempt += 1) {
     const reference = referenceGenerator();
     db.exec("BEGIN IMMEDIATE");
     try {
-      db.prepare(`
+      const lead = db.prepare(`
         INSERT INTO public_leads (
           reference, request_type, company_name, contact_name, email, phone,
           message, consent_version, consent_at, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
+        RETURNING id
+      `).get(
         reference,
         validatedRequest.requestType,
         validatedRequest.company,
@@ -206,7 +210,11 @@ export async function savePublicLead(
         validatedRequest.consentVersion,
         createdAt,
         createdAt,
-      );
+      ) as Pick<LeadRow, "id">;
+      db.prepare(`
+        INSERT INTO public_lead_details (lead_id, detail_json, created_at)
+        VALUES (?, ?, ?)
+      `).run(lead.id, detailJson, createdAt);
       db.exec("COMMIT");
       return {
         reference,
@@ -317,8 +325,9 @@ export async function listPublicLeads({
   const db = await getDatabase();
   const { predicates, arguments: sqlArguments } = createLeadPredicates(filter);
   const rows = db.prepare(`
-    SELECT *
-    FROM public_leads
+    SELECT leads.*, details.detail_json
+    FROM public_leads AS leads
+    LEFT JOIN public_lead_details AS details ON details.lead_id = leads.id
     ${predicates.length > 0 ? `WHERE ${predicates.join(" AND ")}` : ""}
     ORDER BY created_at DESC, id DESC
     LIMIT ?
@@ -438,6 +447,12 @@ async function openAndMigrateDatabase(path: string): Promise<DatabaseSync> {
     CREATE INDEX IF NOT EXISTS idx_public_leads_type_created_at
       ON public_leads(request_type, created_at);
 
+    CREATE TABLE IF NOT EXISTS public_lead_details (
+      lead_id INTEGER PRIMARY KEY REFERENCES public_leads(id) ON DELETE CASCADE,
+      detail_json TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS public_quotations (
       id INTEGER PRIMARY KEY,
       reference TEXT NOT NULL UNIQUE,
@@ -520,6 +535,7 @@ function mapPrivateLead(row: LeadRow): PublicLeadPrivateRecord {
     contactName: row.contact_name,
     email: row.email,
     phone: row.phone,
+    detailJson: row.detail_json,
     message: row.message,
     consentVersion: row.consent_version,
     consentAt: row.consent_at,

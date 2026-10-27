@@ -93,28 +93,97 @@ describe("validatePublicLabRequest", () => {
     if (gravure.success) expect(gravure.data).not.toHaveProperty("message");
   });
 
-  it("accepts consultation and sample requests without technical fields", () => {
-    for (const requestType of ["consultation", "sample"] as const) {
-      const result = validatePublicLabRequest({
-        requestType,
-        ...lead,
+  it("accepts a detailed consultation request without technical fields", () => {
+    const result = validatePublicLabRequest({
+      requestType: "consultation",
+      ...lead,
+      inquiryTopic: "filling_spec",
+      productCategory: "スキンケア",
+      useCase: "新製品サンプル",
+      developmentStage: "development",
+      plannedQuantity: "5000_10000",
+      desiredTiming: "within_3m",
+      message: "",
+      ...consent,
+      honeypot: "",
+    });
+    expect(result).toEqual({
+      success: true,
+      data: {
+        requestType: "consultation",
+        company: "株式会社サンプル",
+        contactName: "山田 太郎",
+        email: "tanaka@example.co.jp",
+        phone: "03-1234-5678",
+        inquiryTopic: "filling_spec",
+        productCategory: "スキンケア",
+        useCase: "新製品サンプル",
+        developmentStage: "development",
+        plannedQuantity: "5000_10000",
+        desiredTiming: "within_3m",
         message: "",
         ...consent,
-        honeypot: "",
-      });
-      expect(result).toEqual({
-        success: true,
-        data: {
-          requestType,
-          company: "株式会社サンプル",
-          contactName: "山田 太郎",
-          email: "tanaka@example.co.jp",
-          phone: "03-1234-5678",
-          message: "",
-          ...consent,
-        },
-      });
-    }
+      },
+    });
+  });
+
+  it("accepts a detailed sample request and normalizes the postal code", () => {
+    const result = validatePublicLabRequest({
+      requestType: "sample",
+      ...lead,
+      sampleShapes: ["rda", "cra"],
+      sampleType: "blank_pouch",
+      sampleQuantity: 3,
+      productName: "美容液サンプル",
+      productCategory: "スキンケア",
+      useCase: "展示会サンプル",
+      plannedQuantity: "10001_50000",
+      desiredTiming: "within_1m",
+      recipientName: "山田 太郎",
+      postalCode: "1500001",
+      prefecture: "東京都",
+      addressLine1: "渋谷区テスト1-2-3",
+      deliveryPhone: "03-1234-5678",
+      message: "",
+      ...consent,
+      honeypot: "",
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data).toMatchObject({
+      requestType: "sample",
+      sampleShapes: ["rda", "cra"],
+      sampleQuantity: 3,
+      postalCode: "150-0001",
+      addressLine1: "渋谷区テスト1-2-3",
+      deliveryPhone: "03-1234-5678",
+    });
+  });
+
+  it("requires detailed sample delivery fields", () => {
+    expectFailure({
+      requestType: "sample",
+      ...lead,
+      sampleShapes: [],
+      sampleType: "blank_pouch",
+      sampleQuantity: 0,
+      productCategory: "スキンケア",
+      useCase: "展示会サンプル",
+      plannedQuantity: "10001_50000",
+      desiredTiming: "within_1m",
+      postalCode: "123",
+      prefecture: "東京都",
+      addressLine1: "渋谷区テスト1-2-3",
+      deliveryPhone: "03-1234-5678",
+      ...consent,
+      honeypot: "",
+    }, [
+      "sampleShapes:requiredField",
+      "sampleQuantity:outOfRange",
+      "productName:requiredField",
+      "recipientName:requiredField",
+      "postalCode:invalidValue",
+    ]);
   });
 
   it("rejects non-plain and prototype-like inputs", () => {
