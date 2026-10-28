@@ -20,10 +20,10 @@ describe("embedded quote form", () => {
 
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
-    const fields = form.querySelectorAll("input:not([type='hidden'])");
-    expect(fields).toHaveLength(28);
+    const fields = form.querySelectorAll("input:not([type='hidden'])[name]");
+    expect(fields).toHaveLength(23);
+    expect(form.querySelectorAll("input[name='fillAmount']")).toHaveLength(1);
     expect([...fields].map((field) => field.getAttribute("name"))).toEqual([
-      ...Array.from({ length: 5 }, () => "fillAmount"),
       ...Array.from({ length: 4 }, () => "designId"),
       ...Array.from({ length: 8 }, () => "sizeKey"),
       ...Array.from({ length: 10 }, () => "colorCount"),
@@ -54,8 +54,9 @@ describe("embedded quote form", () => {
     expect(fillGroup).toHaveTextContent("3g");
     expect(fillGroup).toHaveTextContent("5g");
     expect(fillGroup).toHaveTextContent("10g");
+    expect(within(form).getByTestId("quote-draft-fill-custom")).toBeInTheDocument();
     expect(within(form).getByTestId("quote-draft-fill-help"))
-      .toHaveTextContent("充填量に対応しないデザイン・サイズは自動的に選択できなくなります。");
+      .toHaveTextContent("0.1g単位で直接入力もできます。");
 
     await user.click(within(form).getByRole("radio", { name: "5g" }));
     const craCard = within(form).getByRole("radio", { name: /丸形（CRA）/ });
@@ -65,6 +66,22 @@ describe("embedded quote form", () => {
 
     await user.click(within(form).getByRole("radio", { name: "2g" }));
     expect(within(form).getByRole("radio", { name: "ラウンド 50×60" })).toBeChecked();
+  });
+
+  it("accepts custom fill amounts within the selected design capacity", async () => {
+    const user = userEvent.setup();
+    render(<EmbeddedQuoteDraftForm />);
+    const custom = screen.getByTestId("quote-draft-fill-custom");
+
+    await user.clear(custom);
+    await user.type(custom, "4.5");
+    expect(within(screen.getByTestId("embedded-quote-draft-form")).getByRole("radio", { name: /チューブ（TUA）/ })).toBeEnabled();
+    expect(within(screen.getByTestId("embedded-quote-draft-form")).getByRole("radio", { name: /丸形（CRA）/ })).toBeDisabled();
+
+    await user.clear(custom);
+    await user.type(custom, "1.5");
+    await user.click(within(screen.getByTestId("embedded-quote-draft-form")).getByRole("radio", { name: /丸形（CRA）/ }));
+    expect(within(screen.getByTestId("embedded-quote-draft-form")).getByRole("radio", { name: "丸形 70×70" })).toBeEnabled();
   });
 
   it("constrains size and quantity by the selected design", async () => {

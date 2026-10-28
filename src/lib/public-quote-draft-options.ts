@@ -1,5 +1,4 @@
 import type { PublicLabSizeKey } from "./public-lab-options";
-import { getPublicLabSizeRule } from "./public-lab-rules";
 
 export type PublicQuoteDraftDesignId =
   | "rda"
@@ -21,12 +20,13 @@ export const publicQuoteDraftLocales = [
 
 export const publicQuoteDraftFillOptions = Object.freeze(["1", "2", "3", "5", "10"] as const);
 
-const DESIGN_FILL_OPTIONS = Object.freeze({
-  rda: ["1", "2", "3", "5", "10"],
-  tua: ["1", "3", "5", "10"],
-  bta: ["1", "2", "5", "10"],
-  cra: ["1", "2"],
-} as const satisfies Record<PublicQuoteDraftDesignId, readonly string[]>);
+const PUBLIC_QUOTE_DRAFT_FILL_PATTERN = /^[0-9]+(?:\.[0-9]{1,2})?$/;
+const PUBLIC_QUOTE_DRAFT_CAPACITY: Record<PublicQuoteDraftDesignId, { min: number; max: number }> = Object.freeze({
+  rda: { min: 1, max: 10 },
+  tua: { min: 1, max: 10 },
+  bta: { min: 1, max: 10 },
+  cra: { min: 1, max: 2 },
+});
 
 export function acceptsPublicQuoteDraftFill(
   designId: string,
@@ -35,9 +35,20 @@ export function acceptsPublicQuoteDraftFill(
 ): boolean {
   const design = getPublicQuoteDraftDesign(designId);
   if (!design || !design.sizeKeys.includes(sizeKey as PublicLabSizeKey)) return false;
-  const shapeCode = getPublicLabSizeRule(sizeKey).shapeCode;
-  if (shapeCode === "SPA" || shapeCode === "XRA") return fillAmount === "1";
-  return (DESIGN_FILL_OPTIONS[design.id] as readonly string[]).includes(fillAmount);
+  if (!PUBLIC_QUOTE_DRAFT_FILL_PATTERN.test(fillAmount)) return false;
+  const amount = Number(fillAmount);
+  const capacity = PUBLIC_QUOTE_DRAFT_CAPACITY[design.id];
+  return amount >= capacity.min && amount <= capacity.max;
+}
+
+export function publicQuoteDraftSupportsFill(
+  designId: PublicQuoteDraftDesignId,
+  fillAmount: string,
+): boolean {
+  if (!PUBLIC_QUOTE_DRAFT_FILL_PATTERN.test(fillAmount)) return false;
+  const amount = Number(fillAmount);
+  const capacity = PUBLIC_QUOTE_DRAFT_CAPACITY[designId];
+  return amount >= capacity.min && amount <= capacity.max;
 }
 
 export const publicQuoteDraftDesignOptions = [

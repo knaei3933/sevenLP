@@ -47,7 +47,7 @@ export function EmbeddedQuoteDraftForm() {
   );
   const selectedSizeKey = compatibleSizeKeys.some((candidate) => candidate === (sizeKey as PublicLabSizeKey))
     ? sizeKey
-    : compatibleSizeKeys[0];
+    : compatibleSizeKeys[0] ?? selectedDesign.sizeKeys[0];
   const rule = getPublicLabSizeRule(selectedSizeKey);
 
   function selectFill(nextFill: string) {
@@ -62,6 +62,15 @@ export function EmbeddedQuoteDraftForm() {
     setDesignId(nextDesign.id);
     setSizeKey(nextSizeKey);
     setQuantity(getPublicLabSizeRule(nextSizeKey).minimumQuantity);
+  }
+
+  function changeFillAmount(nextFill: string) {
+    setFillAmount(nextFill);
+  }
+
+  function normalizeFillSelection() {
+    if (acceptsPublicQuoteDraftFill(selectedDesign.id, selectedSizeKey, fillAmount)) return;
+    selectFill(fillAmount);
   }
 
   function selectDesign(nextDesignId: PublicQuoteDraftDesignId) {
@@ -124,7 +133,6 @@ export function EmbeddedQuoteDraftForm() {
                   className={styles.visualHiddenInput}
                   data-testid="quote-draft-fill"
                   disabled={disabled}
-                  name="fillAmount"
                   onChange={() => selectFill(amount)}
                   type="radio"
                   value={amount}
@@ -134,8 +142,27 @@ export function EmbeddedQuoteDraftForm() {
             );
           })}
         </div>
+        <input name="fillAmount" type="hidden" value={fillAmount} />
+        <div className={styles.customFillField}>
+          <label className={styles.plainLabel} htmlFor="quote-draft-fillAmount-custom">
+            上記以外の充填量を直接入力
+          </label>
+          <input
+            className={styles.quantityInput}
+            data-testid="quote-draft-fill-custom"
+            id="quote-draft-fillAmount-custom"
+            inputMode="decimal"
+            max={10}
+            min={1}
+            onBlur={normalizeFillSelection}
+            onChange={(event) => changeFillAmount(event.target.value)}
+            step={0.1}
+            type="number"
+            value={fillAmount}
+          />
+        </div>
         <p className={styles.stepHelp} data-testid="quote-draft-fill-help">
-          充填量に対応しないデザイン・サイズは自動的に選択できなくなります。
+          一般形状は1〜10g、丸形は1〜2g。0.1g単位で直接入力もできます。対応しないデザイン・サイズは自動的に選択できなくなります。
         </p>
       </fieldset>
 

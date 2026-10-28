@@ -1107,6 +1107,11 @@
   gap: 10px;
 }
 
+.customFillField {
+  display: grid;
+  gap: 8px;
+}
+
 .chip {
   position: relative;
   display: inline-flex;
