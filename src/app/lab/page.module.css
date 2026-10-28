@@ -1162,17 +1162,17 @@
   justify-items: center;
   align-content: start;
   gap: 6px;
-  min-height: 156px;
+  min-height: 162px;
   border: 1px solid var(--lp-line-strong);
   border-radius: var(--lp-radius-md);
   background: #fff;
-  padding: 16px 12px;
+  padding: 16px 12px 44px;
   text-align: center;
   cursor: pointer;
   transition: border-color .18s var(--sp-motion-ease), box-shadow .18s var(--sp-motion-ease), transform .18s var(--sp-motion-ease);
 }
 
-.designCard:hover,
+.designCard:not(.chipDisabled):hover,
 .designCard:has(input:not(:disabled):hover) {
   border-color: var(--lp-brand);
   box-shadow: 0 10px 24px rgba(142, 63, 69, .10);
@@ -1218,8 +1218,26 @@
 }
 
 .designDisabledNote {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  border: 1px solid var(--lp-line);
+  border-radius: 999px;
+  background: var(--lp-mist);
   color: var(--lp-muted);
-  font-size: .74rem;
+  font-size: .70rem;
+  font-weight: 750;
+  pointer-events: none;
+}
+
+.designCard.chipDisabled .designMedia,
+.designCard.chipDisabled .designName {
+  opacity: .62;
 }
 
 .conditionColumns {
