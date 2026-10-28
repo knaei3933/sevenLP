@@ -9,7 +9,8 @@ import {
   publicLabDesiredTimingOptions,
   publicLabPlannedQuantityOptions,
   publicLabRequestTypeOptions,
-  publicLabSampleShapes,
+  publicLabSampleSet,
+  publicLabSampleSetItems,
   publicLabSampleTypes,
   type PublicLabRequestType,
 } from "@/lib/public-lab-options";
@@ -31,12 +32,8 @@ const contactTypeOptions = publicLabRequestTypeOptions.filter(
   (option): option is typeof option & { value: ContactRequestType } => option.value !== "quotation",
 );
 const consultationTopicValues = publicLabConsultationTopics.map((option) => option.value);
-const sampleShapeValues = publicLabSampleShapes.map((option) => option.value);
-const sampleTypeValues = publicLabSampleTypes.map((option) => option.value);
-const developmentStageValues = publicLabDevelopmentStageOptions.map((option) => option.value);
-const plannedQuantityValues = publicLabPlannedQuantityOptions.map((option) => option.value);
-const desiredTimingValues = publicLabDesiredTimingOptions.map((option) => option.value);
 const POSTAL_CODE_PATTERN = /^\d{3}-?\d{4}$/;
+const SAMPLE_SET_VALUES = [...publicLabSampleSet];
 
 const errorMessages: Record<string, string> = {
   invalidRequest: "送信内容を処理できません。",
@@ -96,9 +93,7 @@ export function LabRequestForm({
   const [developmentStage, setDevelopmentStage] = useState("idea");
   const [plannedQuantity, setPlannedQuantity] = useState("undetermined");
   const [desiredTiming, setDesiredTiming] = useState("undetermined");
-  const [sampleShapes, setSampleShapes] = useState<string[]>(["rda"]);
   const [sampleType, setSampleType] = useState("blank_pouch");
-  const [sampleQuantity, setSampleQuantity] = useState(1);
   const [productName, setProductName] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -126,14 +121,6 @@ export function LabRequestForm({
     setFieldErrors({});
     setSummaryError("");
     tabRefs.current[nextType]?.focus();
-  }
-
-  function toggleSampleShape(value: string) {
-    setSampleShapes((current) => (
-      current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value]
-    ));
   }
 
   function handleTabKeys(event: KeyboardEvent<HTMLButtonElement>) {
@@ -167,11 +154,7 @@ export function LabRequestForm({
       errors.email = "メールアドレスの形式を確認してください。";
     }
     if (requestType === "sample") {
-      if (sampleShapes.length === 0) errors.sampleShapes = "希望サンプル形状を選択してください。";
       if (productName.trim() === "") errors.productName = "製品・内容物名を入力してください。";
-      if (!Number.isInteger(sampleQuantity) || sampleQuantity < 1 || sampleQuantity > 20) {
-        errors.sampleQuantity = "サンプル点数は1〜20点で入力してください。";
-      }
       if (recipientName.trim() === "") errors.recipientName = "受取人名を入力してください。";
       if (postalCode.trim() === "") errors.postalCode = "郵便番号を入力してください。";
       else if (!POSTAL_CODE_PATTERN.test(postalCode.trim())) errors.postalCode = "郵便番号は7桁で入力してください。";
@@ -216,9 +199,9 @@ export function LabRequestForm({
             inquiryTopic,
             developmentStage,
           } : {
-            sampleShapes,
+            sampleShapes: SAMPLE_SET_VALUES,
             sampleType,
-            sampleQuantity,
+            sampleQuantity: 1,
             productName: productName.trim(),
             recipientName: recipientName.trim(),
             postalCode: postalCode.trim(),
@@ -489,40 +472,24 @@ export function LabRequestForm({
               <legend className={styles.detailLegend}>02 サンプル条件</legend>
               <div className={styles.detailGrid}>
                 <div className={styles.fieldWide}>
-                  <span className={styles.requiredLabel} id="lab-sample-shapes-label">
-                    希望サンプル形状
-                    <span aria-hidden="true" className={styles.requiredMark}>必須</span>
-                  </span>
                   <div
-                    aria-labelledby="lab-sample-shapes-label"
-                    className={styles.choiceChips}
-                    data-testid="lab-sample-shapes"
-                    role="group"
+                    aria-label="提供サンプルセット"
+                    className={styles.fixedSampleSet}
+                    data-testid="lab-sample-set"
                   >
-                    {publicLabSampleShapes.map((option) => {
-                      const selected = sampleShapes.includes(option.value);
-                      return (
-                        <label
-                          className={[
-                            styles.choiceChip,
-                            selected ? styles.chipSelected : "",
-                          ].filter(Boolean).join(" ")}
-                          key={option.value}
-                        >
-                          <input
-                            checked={selected}
-                            data-testid="lab-sample-shape"
-                            name="sampleShapeOption"
-                            onChange={() => toggleSampleShape(option.value)}
-                            type="checkbox"
-                            value={option.value}
-                          />
-                          {option.label}
-                        </label>
-                      );
-                    })}
+                    <p className={styles.fixedSampleSetTitle}>
+                      提供サンプルセット
+                      <span className={styles.fixedSampleSetBadge}>1セットのみ</span>
+                    </p>
+                    <ul className={styles.fixedSampleSetList}>
+                      {publicLabSampleSetItems.map((option) => (
+                        <li key={option.value}>{option.label}</li>
+                      ))}
+                    </ul>
+                    <p className={styles.fixedSampleSetNote}>
+                      サンプルは上記3点を組み合わせた固定セットのため、形状・サイズは選択できません。
+                    </p>
                   </div>
-                  {errorText("sampleShapes")}
                 </div>
                 <div className={styles.field}>
                   <RequiredLabel htmlFor="lab-sampleType">サンプル種類</RequiredLabel>
@@ -542,21 +509,8 @@ export function LabRequestForm({
                   {errorText("sampleType")}
                 </div>
                 <div className={styles.field}>
-                  <RequiredLabel htmlFor="lab-sampleQuantity">サンプル点数</RequiredLabel>
-                  <input
-                    {...fieldErrorProps("sampleQuantity")}
-                    data-testid="lab-sample-quantity"
-                    id="lab-sampleQuantity"
-                    max={20}
-                    min={1}
-                    name="sampleQuantity"
-                    required
-                    step={1}
-                    type="number"
-                    value={sampleQuantity}
-                    onChange={(event) => setSampleQuantity(Number(event.target.value))}
-                  />
-                  {errorText("sampleQuantity")}
+                  <span className={styles.plainLabel}>サンプル数量</span>
+                  <p className={styles.fixedValue}>1セット</p>
                 </div>
                 <div className={styles.field}>
                   <RequiredLabel htmlFor="lab-desiredTiming">希望時期</RequiredLabel>

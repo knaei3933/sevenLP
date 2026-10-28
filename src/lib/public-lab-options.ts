@@ -58,14 +58,17 @@ export const publicLabConsultationTopics = [
   { value: "other", label: "その他" },
 ] as const satisfies readonly PublicLabEnumOption<string>[];
 
-export const publicLabSampleShapes = [
-  { value: "rda", label: "RDA ラウンド" },
-  { value: "tua", label: "TUA チューブ" },
-  { value: "bta", label: "BTA ボトル型" },
-  { value: "cra", label: "CRA 丸形" },
-  { value: "spa", label: "SPA スポイトボトル" },
-  { value: "xra", label: "XRA スリムドーズ" },
+export const publicLabSampleSetItems = [
+  { value: "rda_round_50x80", label: "RDA ラウンド 50×80" },
+  { value: "tua_tube_35x80", label: "TUA チューブ 35×80" },
+  { value: "bta_bottle_35x80", label: "BTA ボトル型 35×80" },
 ] as const satisfies readonly PublicLabEnumOption<string>[];
+
+export const publicLabSampleSet = [
+  "rda_round_50x80",
+  "tua_tube_35x80",
+  "bta_bottle_35x80",
+] as const;
 
 export const publicLabSampleTypes = [
   { value: "blank_pouch", label: "ブランクパウチ" },

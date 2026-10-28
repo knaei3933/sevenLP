@@ -97,10 +97,10 @@ describe("public lab request form", () => {
 
     await user.click(screen.getByRole("tab", { name: "サンプル" }));
     await fillContact(user);
-    await user.click(screen.getByRole("checkbox", { name: "TUA チューブ" }));
+    expect(screen.getByTestId("lab-sample-set")).toHaveTextContent("RDA ラウンド 50×80");
+    expect(screen.getByTestId("lab-sample-set")).toHaveTextContent("TUA チューブ 35×80");
+    expect(screen.getByTestId("lab-sample-set")).toHaveTextContent("BTA ボトル型 35×80");
     await user.selectOptions(screen.getByTestId("lab-sample-type"), "filled_sample");
-    await user.clear(screen.getByTestId("lab-sample-quantity"));
-    await user.type(screen.getByTestId("lab-sample-quantity"), "2");
     await user.type(screen.getByTestId("lab-product-name"), "保湿美容液");
     await fillSharedConditions(user);
     await user.selectOptions(screen.getByTestId("lab-planned-quantity"), "10001_50000");
@@ -116,8 +116,8 @@ describe("public lab request form", () => {
     const body = JSON.parse(fetchMock.mock.calls[0][1]?.body as string);
     expect(body).toMatchObject({
       requestType: "sample",
-      sampleShapes: ["rda", "tua"],
-      sampleQuantity: 2,
+      sampleShapes: ["rda_round_50x80", "tua_tube_35x80", "bta_bottle_35x80"],
+      sampleQuantity: 1,
       productName: "保湿美容液",
       postalCode: "150-0001",
       prefecture: "東京都",

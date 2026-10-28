@@ -131,9 +131,9 @@ describe("validatePublicLabRequest", () => {
     const result = validatePublicLabRequest({
       requestType: "sample",
       ...lead,
-      sampleShapes: ["rda", "cra"],
+      sampleShapes: ["rda_round_50x80", "tua_tube_35x80", "bta_bottle_35x80"],
       sampleType: "blank_pouch",
-      sampleQuantity: 3,
+      sampleQuantity: 1,
       productName: "美容液サンプル",
       productCategory: "スキンケア",
       useCase: "展示会サンプル",
@@ -152,15 +152,15 @@ describe("validatePublicLabRequest", () => {
     if (!result.success) return;
     expect(result.data).toMatchObject({
       requestType: "sample",
-      sampleShapes: ["rda", "cra"],
-      sampleQuantity: 3,
+      sampleShapes: ["rda_round_50x80", "tua_tube_35x80", "bta_bottle_35x80"],
+      sampleQuantity: 1,
       postalCode: "150-0001",
       addressLine1: "渋谷区テスト1-2-3",
       deliveryPhone: "03-1234-5678",
     });
   });
 
-  it("requires detailed sample delivery fields", () => {
+  it("rejects a request that does not contain the fixed sample set", () => {
     expectFailure({
       requestType: "sample",
       ...lead,
@@ -178,7 +178,7 @@ describe("validatePublicLabRequest", () => {
       ...consent,
       honeypot: "",
     }, [
-      "sampleShapes:requiredField",
+      "sampleShapes:invalidValue",
       "sampleQuantity:outOfRange",
       "productName:requiredField",
       "recipientName:requiredField",

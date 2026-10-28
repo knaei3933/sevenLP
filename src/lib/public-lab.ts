@@ -11,7 +11,8 @@ import {
   publicLabDevelopmentStageOptions,
   publicLabDesiredTimingOptions,
   publicLabPlannedQuantityOptions,
-  publicLabSampleShapes,
+  publicLabSampleSet,
+  publicLabSampleSetItems,
   publicLabSampleTypes,
 } from "./public-lab-options";
 
@@ -398,12 +399,15 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
     };
   }
 
-  const sampleShapes = validateEnumArray(
-    input,
-    "sampleShapes",
-    publicLabSampleShapes.map((option) => option.value),
-    errors,
-  );
+  const sampleSetIsValid = Array.isArray(input.sampleShapes)
+    && input.sampleShapes.length === publicLabSampleSet.length
+    && publicLabSampleSet.every((value, index) => (input.sampleShapes as unknown[])[index] === value);
+  if (!sampleSetIsValid) {
+    errors.push({ field: "sampleShapes", code: "invalidValue" });
+  }
+  const sampleShapes = sampleSetIsValid
+    ? [...publicLabSampleSet]
+    : [];
   const sampleType = validateRequiredEnum(
     input,
     "sampleType",
@@ -413,7 +417,7 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
   let sampleQuantity: number | undefined;
   if (typeof input.sampleQuantity !== "number" || !Number.isInteger(input.sampleQuantity)) {
     errors.push({ field: "sampleQuantity", code: "invalidInteger" });
-  } else if (input.sampleQuantity < 1 || input.sampleQuantity > 20) {
+  } else if (input.sampleQuantity !== 1) {
     errors.push({ field: "sampleQuantity", code: "outOfRange" });
   } else {
     sampleQuantity = input.sampleQuantity;
@@ -456,7 +460,7 @@ export function validatePublicLabRequest(input: unknown): PublicLabValidationRes
     data: {
       requestType,
       ...lead,
-      sampleShapes: sampleShapes!,
+      sampleShapes,
       sampleType: sampleType!,
       sampleQuantity: sampleQuantity!,
       productName: productName!,
@@ -586,24 +590,6 @@ function validateRequiredEnum<TValue extends string>(
     return undefined;
   }
   return input[field];
-}
-
-function validateEnumArray<TValue extends string>(
-  input: Record<string, unknown>,
-  field: string,
-  values: readonly TValue[],
-  errors: PublicLabFieldError[],
-): TValue[] | undefined {
-  if (!Array.isArray(input[field]) || input[field].length < 1 || input[field].length > values.length) {
-    errors.push({ field, code: "requiredField" });
-    return undefined;
-  }
-  const unique = [...new Set(input[field])];
-  if (unique.length !== input[field].length || !unique.every((value) => isEnumValue(value, values))) {
-    errors.push({ field, code: "invalidValue" });
-    return undefined;
-  }
-  return input[field] as TValue[];
 }
 
 function isPublicLabSizeKey(value: string): boolean {
