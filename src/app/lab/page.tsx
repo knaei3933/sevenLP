@@ -445,7 +445,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               必要条件だけ入力して見積もりを開始
             </h2>
             <p className={styles.sectionLead}>
-              充填量・形状・サイズ・色数・数量を選ぶと、会員登録後に印刷方法の候補を選んで正式見積もりへ進めます。
+              形状・充填量・サイズ・色数・数量を選ぶと、会員登録後に印刷方法の候補を選んで正式見積もりへ進めます。
             </p>
           </div>
           <div className={styles.quoteForm}>

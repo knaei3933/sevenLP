@@ -95,8 +95,8 @@ export function EmbeddedQuoteDraftForm() {
       method="post"
     >
       <div aria-live="polite" className={styles.selectionSummary}>
-        <span className={styles.summaryValue}>{fillAmount}g</span>
         <span className={styles.summaryValue}>{selectedDesign.id.toUpperCase()}</span>
+        <span className={styles.summaryValue}>{fillAmount}g</span>
         <span className={styles.summaryValue}>{sizeLabel(selectedSizeKey)}</span>
         <span className={styles.summaryValue}>{colorCount}色</span>
         <span className={styles.summaryValue}>{quantity.toLocaleString("ja-JP")}枚</span>
@@ -105,6 +105,53 @@ export function EmbeddedQuoteDraftForm() {
       <fieldset className={styles.stepField}>
         <legend className={styles.stepLabel}>
           <span aria-hidden="true" className={styles.stepNumber}>01</span>
+          デザイン
+        </legend>
+        <div className={styles.designGrid} role="radiogroup" aria-label="デザイン">
+          {publicQuoteDraftDesignOptions.map((design) => {
+            const disabled = !design.sizeKeys.some((candidate) =>
+              acceptsPublicQuoteDraftFill(design.id, candidate, fillAmount),
+            );
+            const selected = designId === design.id;
+            return (
+              <label
+                className={[
+                  styles.designCard,
+                  selected ? styles.designCardSelected : "",
+                  disabled ? styles.chipDisabled : "",
+                ].filter(Boolean).join(" ")}
+                key={design.id}
+              >
+                <input
+                  checked={selected}
+                  className={styles.visualHiddenInput}
+                  data-testid="quote-draft-design-radio"
+                  disabled={disabled}
+                  name="designId"
+                  onChange={() => selectDesign(design.id)}
+                  type="radio"
+                  value={design.id}
+                />
+                <span aria-hidden="true" className={styles.designMedia}>
+                  <Image
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
+                    src={designMedia[design.id]}
+                  />
+                </span>
+                <span className={styles.designCode}>{design.id.toUpperCase()}</span>
+                <span className={styles.designName}>{design.label}</span>
+                {disabled ? <span className={styles.designDisabledNote}>{fillAmount}g非対応</span> : null}
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.stepField}>
+        <legend className={styles.stepLabel}>
+          <span aria-hidden="true" className={styles.stepNumber}>02</span>
           1室充填量
         </legend>
         <div
@@ -166,53 +213,6 @@ export function EmbeddedQuoteDraftForm() {
         <p className={styles.stepHelp} data-testid="quote-draft-fill-help">
           一般形状は1〜10g、丸形は1〜2g。0.1g単位で直接入力もできます。対応しないデザイン・サイズは自動的に選択できなくなります。
         </p>
-      </fieldset>
-
-      <fieldset className={styles.stepField}>
-        <legend className={styles.stepLabel}>
-          <span aria-hidden="true" className={styles.stepNumber}>02</span>
-          デザイン
-        </legend>
-        <div className={styles.designGrid} role="radiogroup" aria-label="デザイン">
-          {publicQuoteDraftDesignOptions.map((design) => {
-            const disabled = !design.sizeKeys.some((candidate) =>
-              acceptsPublicQuoteDraftFill(design.id, candidate, fillAmount),
-            );
-            const selected = designId === design.id;
-            return (
-              <label
-                className={[
-                  styles.designCard,
-                  selected ? styles.designCardSelected : "",
-                  disabled ? styles.chipDisabled : "",
-                ].filter(Boolean).join(" ")}
-                key={design.id}
-              >
-                <input
-                  checked={selected}
-                  className={styles.visualHiddenInput}
-                  data-testid="quote-draft-design-radio"
-                  disabled={disabled}
-                  name="designId"
-                  onChange={() => selectDesign(design.id)}
-                  type="radio"
-                  value={design.id}
-                />
-                <span aria-hidden="true" className={styles.designMedia}>
-                  <Image
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
-                    src={designMedia[design.id]}
-                  />
-                </span>
-                <span className={styles.designCode}>{design.id.toUpperCase()}</span>
-                <span className={styles.designName}>{design.label}</span>
-                {disabled ? <span className={styles.designDisabledNote}>{fillAmount}g非対応</span> : null}
-              </label>
-            );
-          })}
-        </div>
       </fieldset>
 
       <fieldset className={styles.stepField}>

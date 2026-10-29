@@ -44,10 +44,13 @@ describe("embedded quote form", () => {
     expect(source).not.toMatch(/POUCH_QUOTE_DRAFT_SIGNING_KEY|node:crypto/);
   });
 
-  it("chooses fill first and disables incompatible designs and sizes with Japanese help", async () => {
+  it("shows design before fill and disables incompatible designs and sizes with Japanese help", async () => {
     const user = userEvent.setup();
     render(<EmbeddedQuoteDraftForm />);
     const form = screen.getByTestId("embedded-quote-draft-form");
+    const designFieldset = within(form).getByText("デザイン").closest("fieldset")!;
+    const fillFieldset = within(form).getByText("1室充填量").closest("fieldset")!;
+    expect(designFieldset.compareDocumentPosition(fillFieldset) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const fillGroup = within(form).getByTestId("quote-draft-fill-options");
     expect(fillGroup).toHaveTextContent("1g");
     expect(fillGroup).toHaveTextContent("2g");
