@@ -4,6 +4,8 @@ const PUBLIC_PATHS = new Set([
   "/login",
   "/lab",
   "/lab/",
+  "/privacy",
+  "/legal",
   "/robots.txt",
   "/sitemap.xml",
 ]);

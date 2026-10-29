@@ -733,6 +733,10 @@ export function LabRequestForm({
           <label htmlFor="lab-consentAccepted">
             プライバシーポリシーに同意し、お客様情報をお問い合わせ対応に利用することに同意します（必須）。
           </label>
+          <p className={styles.fieldHint}>
+            <a href="/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシーはこちら</a>。
+            取引条件は<a href="/legal" target="_blank" rel="noopener noreferrer">B2B取引条件・特定商取引法に基づく表記</a>をご確認ください。
+          </p>
           {errorText("consentAccepted")}
         </div>
 

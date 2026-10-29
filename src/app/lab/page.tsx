@@ -10,6 +10,7 @@ import craPouch from "./images/generated/CRA-real-skincare.png";
 import spaPouch from "./images/generated/SPA-real-beauty-drink.png";
 import xraPouch from "./images/generated/XRA-real-rounded.png";
 import qualityControl from "./images/quality-control.webp";
+import sampleSachets from "./images/sample-sachets.webp";
 
 const heroSpecs = [
   { value: "6形状", label: "対応形状" },
@@ -165,11 +166,33 @@ const qualityCapabilities = [
   },
 ];
 
+const companyProfile = {
+  legalName: "金井貿易株式会社",
+  legalNameEnglish: "KANAI TRADING CO., LTD.",
+  brand: "Epackage Lab",
+  postalCode: "〒673-0892",
+  address: "兵庫県明石市本町2-1-29 みなとメゾン明石本町2F",
+  email: "shapepouch@package-lab.com",
+  telephone: "050-3613-9673",
+  website: "https://kanei-trade.co.jp/",
+};
+
+const sampleSet = [
+  { code: "RDA", label: "ラウンド 50×80mm", use: "化粧水・美容液の定番タイプ" },
+  { code: "TUA", label: "チューブ 35×80mm", use: "ヘアケア・トリートメント向け" },
+  { code: "BTA", label: "ボトル型 35×80mm", use: "美容液・ボトルタイプ向け" },
+];
+
 const liquidCategories = [
   {
     title: "スキンケア・基礎化粧品",
     examples: ["化粧水", "美容液", "乳液", "液状クリーム"],
     note: "水系・乳化系のトライアルや単回サンプルに適した少量充填です。",
+  },
+  {
+    title: "医薬部外品・機能性ケア",
+    examples: ["薬用アクネケア", "薬用美白", "スカルプケア"],
+    note: "効能表示や処方要件を事前確認のうえ、充填から製造まで対応を相談できます。",
   },
   {
     title: "ヘア・ボディケア",
@@ -316,8 +339,8 @@ const faqGroups: FaqGroup[] = [
         answer: "低粘度から高粘度まで相談可能です。ただし、成分とフィルム・シール部の相容性、分散・沈降の安定性、充填口詰まりの リスク等により可否が変わるため、見本確認を推奨します。",
       },
       {
-        question: "医薬部外品や特殊用途の液剤も相談できますか？",
-        answer: "処方・表示・法規制上の扱いにより確認が必要です。まずは内容物、用途、想定数量、希望時期をご相談ください。条件確認後に進行可否をご案内します。",
+        question: "医薬部外品や特殊用途の液剤も対応できますか？",
+        answer: "対応を相談できます。効能表示、処方要件、製造販売責任の所在、法規制上の確認が必要です。内容物・用途・想定数量を確認したうえで、充填から製造までの進め方をご案内します。",
       },
     ],
   },
@@ -508,6 +531,47 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </div>
         </section>
 
+        <section id="lab-operator" className={`${styles.section} ${styles.companySection}`} aria-labelledby="lab-company-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>運営・品質体制｜COMPANY</p>
+            <h2 className={styles.sectionHeading} id="lab-company-heading">
+              金井貿易株式会社が、Epackage Labとして一括窓口を担当します
+            </h2>
+            <p className={styles.sectionLead}>
+              ご相談からお見積もり、ご発注、品質対応までの窓口はEpackage Labに一元化しています。生産情報はNDAと発注条件の確定後に、必要な範囲のみご案内します。
+            </p>
+          </div>
+          <div className={styles.companyGrid}>
+            <article className={styles.companyCard}>
+              <p className={styles.companyBadge}>運営会社</p>
+              <h3>{companyProfile.legalName}</h3>
+              <p className={styles.companyEnglish}>{companyProfile.legalNameEnglish}</p>
+              <dl>
+                <div><dt>ブランド</dt><dd>{companyProfile.brand}</dd></div>
+                <div><dt>所在地</dt><dd>{companyProfile.postalCode}<br />{companyProfile.address}</dd></div>
+                <div><dt>お問い合わせ</dt><dd>{companyProfile.email}<br />{companyProfile.telephone}</dd></div>
+                <div><dt>公式サイト</dt><dd><a href={companyProfile.website} target="_blank" rel="noopener noreferrer">kanei-trade.co.jp</a></dd></div>
+              </dl>
+            </article>
+            <article className={styles.companyCard}>
+              <p className={styles.companyBadge}>単一窓口ポリシー</p>
+              <h3>生産現場へ直接依頼せず、条件も非公開で管理</h3>
+              <p>
+                品質責任と情報管理のため、ご相談・お見積もり・ご発注・仕様変更・品質対応はすべてEpackage Lab窓口で行います。
+              </p>
+              <ul className={styles.companyPoints}>
+                <li>NDA締結後に必要範囲の情報のみ共有</li>
+                <li>工場名・所在地は公開しない</li>
+                <li>発注確定後にバルク送付先をご案内</li>
+                <li>仕様変更・品質対応も一括受付</li>
+              </ul>
+              <div className={styles.companyActions}>
+                <a className={styles.buttonPrimary} href="?requestType=consultation#lab-request">信頼条件について相談する</a>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section className={`${styles.section} ${styles.valueSection}`} aria-labelledby="lab-value-heading">
           <div className={styles.sectionHead}>
             <p className={styles.sectionLabel}>価値｜BENEFITS</p>
@@ -535,7 +599,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               充填するのは、化粧品・トイレタリーの液剤です
             </h2>
             <p className={styles.sectionLead}>
-              スキンケアを中心に、美容液・乳液・ヘアケア・UVケアなどの液剤を小容量パウチへ充填します。支給バルクの処方条件を確認しながら、サンプルから量産へ進められます。
+              スキンケアを中心に、美容液・乳液・ヘアケア・UVケア・医薬部外品などの液剤を小容量パウチへ充填します。支給バルクの処方条件を確認しながら、サンプルから量産、製造まで進められます。
             </p>
           </div>
           <ul className={styles.liquidGrid}>
@@ -645,6 +709,50 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           <p className={styles.sectionNote}>
             ※仕上げ・表面仕様は、見本確認と仕様確定時に承ります。掲載画像はイメージです。
           </p>
+        </section>
+
+        <section id="lab-sample" className={`${styles.section} ${styles.sampleSection}`} aria-labelledby="lab-sample-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>無料サンプル｜SAMPLE</p>
+            <h2 className={styles.sectionHeading} id="lab-sample-heading">
+              化粧品液剤との相性を、無料サンプルで確認
+            </h2>
+            <p className={styles.sectionLead}>
+              現在は、RDA・TUA・BTAを組み合わせた固定サンプル1セットを無料でご用意しています。形状・サイズの選択はできません。
+            </p>
+          </div>
+          <div className={styles.sampleShowcase}>
+            <figure className={styles.sampleMedia}>
+              <Image
+                src={sampleSachets}
+                alt="化粧品サンプル用パウチのイメージ"
+                fill
+                sizes="(min-width: 1024px) 46vw, 92vw"
+                className={styles.roundedImage}
+              />
+            </figure>
+            <div className={styles.sampleBody}>
+              <ul className={styles.sampleCards}>
+                {sampleSet.map((sample) => (
+                  <li key={sample.code}>
+                    <strong>{sample.code}</strong>
+                    <span>{sample.label}</span>
+                    <small>{sample.use}</small>
+                  </li>
+                ))}
+              </ul>
+              <ul className={styles.samplePoints}>
+                <li>サンプル費用：完全無料</li>
+                <li>提供数量：1セットのみ</li>
+                <li>お届け先・連絡先は必須入力</li>
+                <li>確認後、量産条件と正式見積もりへ進行</li>
+              </ul>
+              <div className={styles.sampleActions}>
+                <a className={styles.buttonPrimary} href="?requestType=sample#lab-request">無料サンプルを申し込む</a>
+                <a className={styles.quietLink} href="/legal">取引条件を確認する</a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
@@ -814,7 +922,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
         <div className={styles.footerInner}>
           <div>
             <p className={styles.footerBrand}>パウチ充填ラボ</p>
-            <p className={styles.footerAffiliation}>Epackage Labのパウチ充填専門サービス</p>
+            <p className={styles.footerAffiliation}>運営：金井貿易株式会社 / Epackage Labのパウチ充填専門サービス</p>
             <p className={styles.footerNote}>
               掲載画像はイメージです。仕様・対応範囲はお見積もり時に確認します。
             </p>
@@ -826,10 +934,12 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               <li><a href="#lab-quality">品質体制</a></li>
               <li><a href="#lab-process">進め方</a></li>
               <li><a href="#lab-contact">お問い合わせ</a></li>
+              <li><a href="/privacy">プライバシーポリシー</a></li>
+              <li><a href="/legal">取引条件・特商法表記</a></li>
             </ul>
           </nav>
         </div>
-        <p className={styles.copyright}>&copy; パウチ充填ラボ</p>
+        <p className={styles.copyright}>&copy; 金井貿易株式会社 / パウチ充填ラボ</p>
       </footer>
     </>
   );
