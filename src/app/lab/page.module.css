@@ -1036,13 +1036,28 @@
 }
 
 .selectionSummary {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: var(--lp-radius-lg);
+  background: linear-gradient(135deg, var(--lp-brand-deep), #58333a);
+  color: #fff;
+  padding: clamp(18px, 3vw, 28px);
+  box-shadow: 0 14px 30px rgba(31, 22, 24, .14);
+}
+
+.summaryTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 850;
+  letter-spacing: .02em;
+}
+
+.summaryValues {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  border-radius: var(--lp-radius-md);
-  background: var(--lp-brand-deep);
-  padding: 14px;
 }
 
 .summaryValue {
@@ -1052,7 +1067,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, .14);
   color: #fff;
-  padding: 4px 12px;
+  padding: 6px 14px;
   font-family: var(--font-noto-sans-mono), monospace;
   font-size: .78rem;
   font-weight: 750;

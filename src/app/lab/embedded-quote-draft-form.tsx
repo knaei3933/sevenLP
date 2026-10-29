@@ -94,14 +94,6 @@ export function EmbeddedQuoteDraftForm() {
       data-testid="embedded-quote-draft-form"
       method="post"
     >
-      <div aria-live="polite" className={styles.selectionSummary}>
-        <span className={styles.summaryValue}>{selectedDesign.id.toUpperCase()}</span>
-        <span className={styles.summaryValue}>{fillAmount}g</span>
-        <span className={styles.summaryValue}>{sizeLabel(selectedSizeKey)}</span>
-        <span className={styles.summaryValue}>{colorCount}色</span>
-        <span className={styles.summaryValue}>{quantity.toLocaleString("ja-JP")}枚</span>
-      </div>
-
       <fieldset className={styles.stepField}>
         <legend className={styles.stepLabel}>
           <span aria-hidden="true" className={styles.stepNumber}>01</span>
@@ -323,6 +315,23 @@ export function EmbeddedQuoteDraftForm() {
       <p className={styles.stepHelp} data-testid="quote-draft-limit-note">
         送信後、会員登録またはログインして印刷方法の候補を選択できます。条件URLの有効期限は60分です。
       </p>
+
+      <section
+        aria-labelledby="quote-draft-summary-title"
+        aria-live="polite"
+        className={styles.selectionSummary}
+        data-testid="quote-draft-summary"
+      >
+        <h3 className={styles.summaryTitle} id="quote-draft-summary-title">選択内容の確認</h3>
+        <div className={styles.summaryValues}>
+          <span className={styles.summaryValue}>{selectedDesign.id.toUpperCase()}</span>
+          <span className={styles.summaryValue}>{fillAmount}g</span>
+          <span className={styles.summaryValue}>{sizeLabel(selectedSizeKey)}</span>
+          <span className={styles.summaryValue}>{colorCount}色</span>
+          <span className={styles.summaryValue}>{quantity.toLocaleString("ja-JP")}枚</span>
+        </div>
+      </section>
+
       <button className={styles.submit} data-testid="quote-draft-submit" type="submit">
         見積もり条件を送信する
       </button>

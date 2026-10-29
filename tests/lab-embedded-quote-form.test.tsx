@@ -32,6 +32,15 @@ describe("embedded quote form", () => {
     expect(form.querySelector("input[name='locale']")).toHaveValue("ja");
     expect(screen.getByRole("heading", { name: "必要条件だけ入力して見積もりを開始" })).toBeInTheDocument();
 
+    const summary = within(form).getByTestId("quote-draft-summary");
+    const submit = within(form).getByTestId("quote-draft-submit");
+    expect(summary).toHaveTextContent("RDA");
+    expect(summary).toHaveTextContent("1g");
+    expect(summary).toHaveTextContent("ラウンド 50×60");
+    expect(summary).toHaveTextContent("1色");
+    expect(summary).toHaveTextContent("10,000枚");
+    expect(summary.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
     const source = await readFile(
       path.join(projectRoot, "src/app/lab/embedded-quote-draft-form.tsx"),
       "utf8",
