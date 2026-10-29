@@ -257,30 +257,131 @@ const processItems = [
   },
 ];
 
-const faqItems = [
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+type FaqGroup = {
+  title: string;
+  lead: string;
+  items: FaqItem[];
+};
+
+const faqGroups: FaqGroup[] = [
   {
-    question: "価格はいつ確認できますか？",
-    answer: "仕様入力後に会社名・お名前・メールアドレス・電話番号と同意を送信いただくと、サーバー側で再計算した価格を表示します。",
+    title: "見積もり・会員登録",
+    lead: "Web見積もりの入力範囲、価格確認、会員登録後の流れです。",
+    items: [
+      {
+        question: "Web見積もりはどのように進みますか？",
+        answer: "デザイン・充填量・サイズ・色数・数量を選んで下書き条件を送信すると、会員登録またはログイン後に印刷方法の候補を選択できます。選択した条件で正式見積もりを作成します。",
+      },
+      {
+        question: "価格はいつ確認できますか？",
+        answer: "仕様入力後に会社名・お名前・メールアドレス・電話番号と同意を送信いただくと、サーバー側で再計算した価格を表示します。",
+      },
+      {
+        question: "下書き条件のURLはどれくらい使えますか？",
+        answer: "発行から60分間です。期限を過ぎた場合は、同じ条件を入力し直して再度発行してください。",
+      },
+      {
+        question: "お見積書の有効期限はどこで確認できますか？",
+        answer: "お見積書に発行日と有効期限を表示します。期限を過ぎた条件は、原材料・印刷条件の見直し後にお見積もりを更新することがあります。",
+      },
+      {
+        question: "作成した見積もりは後から確認できますか？",
+        answer: "会員アカウントの見積もり履歴から、条件・金額・状態・PDFを確認できます。作成済みの条件をコピーして再見積もりも可能です。",
+      },
+    ],
   },
   {
-    question: "バルク（内容物）はどのように扱いますか？",
-    answer: "本サービスのお見積もりは、お客様支給のバルクを前提としています。内容物の性状や充填条件はご相談時に確認します。",
+    title: "充填内容物・支給バルク",
+    lead: "化粧品・トイレタリーの液剤を中心に、支給バルクの条件を確認します。",
+    items: [
+      {
+        question: "どのような内容物を充填できますか？",
+        answer: "化粧水・美容液・乳液・液状クリームなどのスキンケア液剤を中心に、ヘアケア・ボディケア・メイクアップ・UVケア・クレンジング・トイレタリー向け液剤を想定しています。処方により可否が変わるため、支給バルクと見本充填で確認します。",
+      },
+      {
+        question: "バルク（内容物）はどのように扱いますか？",
+        answer: "本サービスのお見積もりは、お客様支給のバルクを前提としています。内容物・粘度・比重・充填温度などの性状や充填条件は、ご相談時に確認します。",
+      },
+      {
+        question: "支給バルクの受け渡し形式は事前に教えてもらえますか？",
+        answer: "ご発注確定後に、支給形式・受け渡し方法・確認事項を個別にご案内します。公開ページでは条件が確定していない内容を固定でお伝えしません。",
+      },
+      {
+        question: "粘度が高い液剤やオイル系も相談できますか？",
+        answer: "低粘度から高粘度まで相談可能です。ただし、成分とフィルム・シール部の相容性、分散・沈降の安定性、充填口詰まりの リスク等により可否が変わるため、見本確認を推奨します。",
+      },
+      {
+        question: "医薬部外品や特殊用途の液剤も相談できますか？",
+        answer: "処方・表示・法規制上の扱いにより確認が必要です。まずは内容物、用途、想定数量、希望時期をご相談ください。条件確認後に進行可否をご案内します。",
+      },
+    ],
   },
   {
-    question: "仕様が固まっていない場合はどうすればよいですか？",
-    answer: "「ご相談」タブから、内容物・用途・想定数量だけをお知らせください。確定前の条件整理から進めます。",
+    title: "サンプル依頼",
+    lead: "現在ご用意しているサンプル構成と、ご依頼方法です。",
+    items: [
+      {
+        question: "サンプルは有料ですか？",
+        answer: "無料でご用意しています。現在は、あらかじめ決められた1セットのみのお渡しです。",
+      },
+      {
+        question: "サンプルの内容は選べますか？",
+        answer: "現在のご用意は1セット限定です。構成はRDA 50×80mm、TUA 35×80mm、BTA 35×80mmです。個別の形状や充填量での現物確認は、正式条件としてご相談ください。",
+      },
+      {
+        question: "サンプルだけ依頼できますか？",
+        answer: "「サンプル」タブから、会社情報とご連絡先、ご相談内容を送信できます。サンプル確認後に、量産条件の整理へ進めます。",
+      },
+    ],
   },
   {
-    question: "スティック状や特殊形状も相談できますか？",
-    answer: "現在の見積入力には連結サイズや用途別サイズを含みます。スティック状・特殊仕様は、入力条件とは別にご相談ください。",
+    title: "製造・納期・お支払い",
+    lead: "最小ロット、標準的な進行期間、お支払い条件の前提です。",
+    items: [
+      {
+        question: "最小ロットはいくつですか？",
+        answer: "基本は10,000枚からです。SPAは50,000枚からです。Web入力の上限数量の設定はありませんが、数量・サイズ・印刷条件により実施可否を確認します。",
+      },
+      {
+        question: "納期はどのくらいかかりますか？",
+        answer: "データ到着後、約2ヶ月を標準的な目安としています。デザイン確定、バルク到着、校正・見本確認、印刷方式、数量により前後するため、正式条件を確認後に個別にご案内します。",
+      },
+      {
+        question: "お支払い条件を教えてください。",
+        answer: "基本は後払いです。ただし新規お取引先様の場合は、前払いをお願いすることがあります。取引条件は事前審査のうえ確定します。",
+      },
+      {
+        question: "スティック状や特殊形状も相談できますか？",
+        answer: "現在の見積入力には連結サイズや用途別サイズを含みます。スティック状・特殊仕様は、入力条件とは別にご相談ください。",
+      },
+    ],
   },
   {
-    question: "サンプルだけ依頼できますか？",
-    answer: "「サンプル」タブから、会社情報とご連絡先、ご相談内容を送信できます。",
-  },
-  {
-    question: "お見積りの有効期限はどこで確認できますか？",
-    answer: "価格表示後のお見積り結果に、発行日時と有効期限を表示します。",
+    title: "機密保持・その他のご相談",
+    lead: "処方・デザイン情報の取り扱いと、進行前の確認方法です。",
+    items: [
+      {
+        question: "処方やデザインデータの機密保持はできますか？",
+        answer: "NDAを締結したうえで進行します。処方・アートワーク・見積条件は関係者以外が閲覧できないようアクセスを制限します。",
+      },
+      {
+        question: "仕様が固まっていない場合はどうすればよいですか？",
+        answer: "「ご相談」タブから、内容物・用途・想定数量だけをお知らせください。確定前の条件整理から進めます。",
+      },
+      {
+        question: "デザインデータや印刷校正はどのように進みますか？",
+        answer: "ご入稿いただいたデータをもとに、色再現・文字切れ・密封部への影響を確認します。必要に応じて校正・見本確認を行い、承認後に量産へ進めます。",
+      },
+      {
+        question: "品質チェックはどのように行われますか？",
+        answer: "GMP準拠の品質管理とISO22716準拠システムを前提に、充填量・外観・密封状態などの確認を行います。詳細な検査項目は条件確定時に取り決めます。",
+      },
+    ],
   },
 ];
 
@@ -636,17 +737,30 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </ol>
         </section>
 
-        <section className={`${styles.section} ${styles.faqSection}`} aria-labelledby="lab-faq-heading">
+        <section id="lab-faq" className={`${styles.section} ${styles.faqSection}`} aria-labelledby="lab-faq-heading">
           <div className={styles.sectionHead}>
             <p className={styles.sectionLabel}>よくあるご質問｜FAQ</p>
             <h2 className={styles.sectionHeading} id="lab-faq-heading">お見積もりとサンプル依頼の前提</h2>
+            <p className={styles.sectionLead}>
+              条件入力から量産までによく確認される事項を、カテゴリー別に整理しています。個別条件はご相談後に確定します。
+            </p>
           </div>
-          <div className={styles.faqList}>
-            {faqItems.map((item) => (
-              <details key={item.question} className={styles.faqItem}>
-                <summary>{item.question}</summary>
-                <p>{item.answer}</p>
-              </details>
+          <div className={styles.faqGroups}>
+            {faqGroups.map((group) => (
+              <section key={group.title} className={styles.faqGroup} aria-label={group.title}>
+                <div className={styles.faqGroupHead}>
+                  <h3 className={styles.faqGroupTitle}>{group.title}</h3>
+                  <p>{group.lead}</p>
+                </div>
+                <div className={styles.faqList}>
+                  {group.items.map((item) => (
+                    <details key={item.question} className={styles.faqItem}>
+                      <summary>{item.question}</summary>
+                      <p>{item.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         </section>

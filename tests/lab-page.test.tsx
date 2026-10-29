@@ -52,6 +52,19 @@ describe("public lab identity", () => {
     expect(document.querySelector("#lab-request-fields")).toBeInTheDocument();
   });
 
+  it("explains quote, filling, sample, lead time, payment, and confidentiality FAQs", async () => {
+    render(await LabPage({ searchParams: Promise.resolve({}) }));
+
+    const faq = document.querySelector("#lab-faq") as HTMLElement;
+    expect(faq).not.toBeNull();
+    expect(within(faq).getAllByRole("heading", { level: 3 })).toHaveLength(5);
+    expect(faq.querySelectorAll("details")).toHaveLength(21);
+    expect(within(faq).getByText("サンプルは有料ですか？")).toBeInTheDocument();
+    expect(within(faq).getByText("納期はどのくらいかかりますか？")).toBeInTheDocument();
+    expect(within(faq).getByText("お支払い条件を教えてください。")).toBeInTheDocument();
+    expect(within(faq).getByText("処方やデザインデータの機密保持はできますか？")).toBeInTheDocument();
+  });
+
   it("explains production and quality conditions without hiding SPA's minimum", async () => {
     render(await LabPage({ searchParams: Promise.resolve({}) }));
 
