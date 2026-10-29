@@ -50,7 +50,7 @@ export const sizeMaster: Record<SizeKey, SizeMaster> = {
   "bottle-50x90": base("bottle-50x90", "bottle", "ボトル型 50×90", 50, 90, 4, 476, "lte570", 6, 1),
   "bottle-70x120": base("bottle-70x120", "bottle", "ボトル型 70×120", 70, 120, 4, 620, "571to740", 6, 1),
   "spa-35x80": switchable("spa-35x80", "bottle", "スポイトボトル型 35×80", 35, 80),
-  "xra-38.5x90": switchableWeb("xra-38.5x90", "xraRound", "スリムドーズ 38.5×90（XRA）", 38.5, 90, 368),
+  "xra-38.5x90": switchableWeb("xra-38.5x90", "xraRound", "XRAラウンド 38.5×90", 38.5, 90, 368),
   "mouthwash-45x145": base("mouthwash-45x145", "mouthWash", "マウスウォッシュ用 45×145", 45, 145, 4, 396, "lte570", 6, 1),
 };
 

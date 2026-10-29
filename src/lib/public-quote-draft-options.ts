@@ -4,7 +4,8 @@ export type PublicQuoteDraftDesignId =
   | "rda"
   | "tua"
   | "bta"
-  | "cra";
+  | "cra"
+  | "xra";
 
 export type PublicQuoteDraftLocale = "ja";
 
@@ -26,6 +27,7 @@ const PUBLIC_QUOTE_DRAFT_CAPACITY: Record<PublicQuoteDraftDesignId, { min: numbe
   tua: { min: 1, max: 10 },
   bta: { min: 1, max: 10 },
   cra: { min: 1, max: 2 },
+  xra: { min: 1, max: 1 },
 });
 
 export function acceptsPublicQuoteDraftFill(
@@ -82,6 +84,11 @@ export const publicQuoteDraftDesignOptions = [
     ],
   },
   { id: "cra", label: "丸形（CRA）", sizeKeys: ["circle-70x70"] },
+  {
+    id: "xra",
+    label: "XRAラウンド（XRA）",
+    sizeKeys: ["xra-38.5x90"],
+  },
 ] as const satisfies readonly PublicQuoteDraftDesignOption[];
 
 export function getPublicQuoteDraftDesign(

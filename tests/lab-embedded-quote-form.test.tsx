@@ -21,10 +21,10 @@ describe("embedded quote form", () => {
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
     const fields = form.querySelectorAll("input:not([type='hidden'])[name]");
-    expect(fields).toHaveLength(23);
+    expect(fields).toHaveLength(24);
     expect(form.querySelectorAll("input[name='fillAmount']")).toHaveLength(1);
     expect([...fields].map((field) => field.getAttribute("name"))).toEqual([
-      ...Array.from({ length: 4 }, () => "designId"),
+      ...Array.from({ length: 5 }, () => "designId"),
       ...Array.from({ length: 8 }, () => "sizeKey"),
       ...Array.from({ length: 10 }, () => "colorCount"),
       "quantity",
@@ -90,9 +90,9 @@ describe("embedded quote form", () => {
     const form = screen.getByTestId("embedded-quote-draft-form");
     const quantity = within(form).getByLabelText(/希望数量/);
 
-    const designRadios = within(form).getAllByRole("radio", { name: /（(?:RDA|TUA|BTA|CRA)）/ });
+    const designRadios = within(form).getAllByRole("radio", { name: /（(?:RDA|TUA|BTA|CRA|XRA)）/ });
     expect(designRadios.map((radio) => radio.getAttribute("value"))).toEqual([
-      "rda", "tua", "bta", "cra",
+      "rda", "tua", "bta", "cra", "xra",
     ]);
     expect(within(form).getByRole("radio", { name: "ラウンド 50×60" })).toBeChecked();
     expect(quantity).toHaveValue(10_000);

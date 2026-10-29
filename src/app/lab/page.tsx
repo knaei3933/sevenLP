@@ -103,14 +103,14 @@ const pouchShapes = [
   },
   {
     code: "XRA",
-    name: "スリムドーズ型",
+    name: "ラウンド型",
     usage: "単回使い切りのロット印字対応に。",
     useCaseTags: ["単回使い切り", "ロット印字"],
     size: "38.5×90",
     capacity: "1g",
     minimumQuantity: "10,000枚〜／上限なし",
     image: xraPouch,
-    alt: "XRA スリムドーズ型パウチの単体製品写真",
+    alt: "XRA ラウンド型パウチの単体製品写真",
   },
 ];
 

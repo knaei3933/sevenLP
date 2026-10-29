@@ -17,6 +17,7 @@ import craPouch from "./images/generated/CRA-real-skincare.png";
 import btaPouch from "./images/generated/BTA-real-premium.png";
 import rdaPouch from "./images/generated/RDA-real-edited.png";
 import tuaPouch from "./images/generated/TUA-real-edited.png";
+import xraPouch from "./images/generated/XRA-real-rounded.png";
 
 const QUOTE_DRAFT_ROUTE = "/api/public/lab/quote-drafts";
 const COLOR_OPTIONS = Array.from({ length: 10 }, (_, index) => index + 1);
@@ -27,6 +28,7 @@ const designMedia: Record<PublicQuoteDraftDesignId, Parameters<typeof Image>[0][
   tua: tuaPouch,
   bta: btaPouch,
   cra: craPouch,
+  xra: xraPouch,
 };
 
 const sizeLabel = (key: PublicLabSizeKey) =>

@@ -146,8 +146,8 @@ describe("signed guest quote draft contract", () => {
     expectError("invalid_token", () => verifyPublicQuoteDraft(`public-quote-draft.v1.${"A".repeat(2049)}.B`));
   });
 
-  it("allows exactly the approved RDA/CRA/TUA/BTA designs and rejects five million and one", () => {
-    expect(publicQuoteDraftDesignOptions.map((design) => design.id)).toEqual(["rda", "tua", "bta", "cra"]);
+  it("allows exactly the approved RDA/CRA/TUA/BTA/XRA designs and rejects five million and one", () => {
+    expect(publicQuoteDraftDesignOptions.map((design) => design.id)).toEqual(["rda", "tua", "bta", "cra", "xra"]);
     expect(QUOTE_DRAFT_MAX_QUANTITY).toBe(Number.MAX_SAFE_INTEGER);
     expectError("invalid_request", () => issuePublicQuoteDraft({
       ...validInput,
@@ -157,6 +157,29 @@ describe("signed guest quote draft contract", () => {
       ...validInput,
       quantity: QUOTE_DRAFT_MAX_QUANTITY,
     })).not.toThrow();
+  });
+
+  it("issues and verifies the XRA round design at its 1g capacity", () => {
+    const issued = issuePublicQuoteDraft({
+      ...validInput,
+      designId: "xra",
+      fillAmount: "1",
+      quantity: 10_000,
+      sizeKey: "xra-38.5x90",
+    });
+    expect(payloadFrom(issued.token)).toMatchObject({
+      designId: "xra",
+      fillAmount: "1",
+      sizeKey: "xra-38.5x90",
+    });
+    expect(() => verifyPublicQuoteDraft(issued.token)).not.toThrow();
+    expectError("invalid_request", () => issuePublicQuoteDraft({
+      ...validInput,
+      designId: "xra",
+      fillAmount: "2",
+      quantity: 10_000,
+      sizeKey: "xra-38.5x90",
+    }));
   });
 
   it("normalizes configured signing keys identically for issue and verification", () => {
