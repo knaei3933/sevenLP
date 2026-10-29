@@ -1025,7 +1025,7 @@
 .quoteFormShell {
   display: grid;
   gap: 24px;
-  width: min(900px, 100%);
+  width: min(1160px, 100%);
   margin: 0 auto;
   border: var(--lp-border);
   border-top: 4px solid var(--lp-brand);
@@ -1157,8 +1157,8 @@
 
 .designGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
 }
 
 .designCard {
@@ -1166,12 +1166,12 @@
   display: grid;
   justify-items: center;
   align-content: start;
-  gap: 9px;
-  min-height: 228px;
+  gap: 12px;
+  overflow: hidden;
   border: 1px solid var(--lp-line-strong);
-  border-radius: var(--lp-radius-md);
+  border-radius: var(--lp-radius-lg);
   background: #fff;
-  padding: 18px 14px 48px;
+  padding: 22px 20px 66px;
   text-align: center;
   cursor: pointer;
   transition: border-color .18s var(--sp-motion-ease), box-shadow .18s var(--sp-motion-ease), transform .18s var(--sp-motion-ease);
@@ -1200,42 +1200,48 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 132px;
-  height: 118px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--lp-radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 58%, rgba(142, 63, 69, .05) 100%),
+    var(--lp-canvas-soft);
 }
 
 .designMedia img {
   object-fit: contain;
+  padding: clamp(8px, 2vw, 18px);
 }
 
 .designCode {
   color: var(--lp-brand-text);
   font-family: var(--font-noto-sans-mono), monospace;
-  font-size: .74rem;
-  font-weight: 750;
-  letter-spacing: .08em;
+  font-size: .84rem;
+  font-weight: 800;
+  letter-spacing: .1em;
 }
 
 .designName {
   color: var(--lp-ink);
-  font-size: .84rem;
-  font-weight: 750;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .designDisabledNote {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  left: 10px;
+  right: 16px;
+  bottom: 18px;
+  left: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 26px;
+  min-height: 36px;
   border: 1px solid var(--lp-line);
   border-radius: 999px;
   background: var(--lp-mist);
   color: var(--lp-muted);
-  font-size: .70rem;
+  font-size: .8rem;
   font-weight: 750;
   pointer-events: none;
 }
@@ -1250,14 +1256,23 @@
   gap: 24px;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 640px) {
   .designGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
+@media (min-width: 720px) {
   .conditionColumns {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .designGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
   }
 }
 

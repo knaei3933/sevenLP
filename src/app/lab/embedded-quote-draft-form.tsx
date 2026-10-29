@@ -202,7 +202,7 @@ export function EmbeddedQuoteDraftForm() {
                   <Image
                     alt=""
                     fill
-                    sizes="(max-width: 640px) 42vw, 120px"
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
                     src={designMedia[design.id]}
                   />
                 </span>
