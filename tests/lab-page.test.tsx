@@ -57,11 +57,16 @@ describe("public lab identity", () => {
 
     const faq = document.querySelector("#lab-faq") as HTMLElement;
     expect(faq).not.toBeNull();
-    expect(within(faq).getAllByRole("heading", { level: 3 })).toHaveLength(5);
-    expect(faq.querySelectorAll("details")).toHaveLength(21);
+    expect(within(faq).getAllByRole("heading", { level: 3 })).toHaveLength(6);
+    expect(faq.querySelectorAll("details")).toHaveLength(26);
     expect(within(faq).getByText("サンプルは有料ですか？")).toBeInTheDocument();
     expect(within(faq).getByText("納期はどのくらいかかりますか？")).toBeInTheDocument();
     expect(within(faq).getByText("お支払い条件を教えてください。")).toBeInTheDocument();
+    expect(within(faq).getByText("生産工場の所在地を教えてください。")).toBeInTheDocument();
+    expect(within(faq).getByText("生産工場へ直接問い合わせや発注はできますか？")).toBeInTheDocument();
+    expect(faq.textContent).not.toContain("セブン化学");
+    expect(faq.textContent).not.toContain("7chemical.co.jp");
+    expect(faq.textContent).not.toContain("柏原市");
     expect(within(faq).getByText("処方やデザインデータの機密保持はできますか？")).toBeInTheDocument();
   });
 
