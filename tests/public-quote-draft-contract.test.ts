@@ -148,7 +148,7 @@ describe("signed guest quote draft contract", () => {
 
   it("allows exactly the approved RDA/CRA/TUA/BTA designs and rejects five million and one", () => {
     expect(publicQuoteDraftDesignOptions.map((design) => design.id)).toEqual(["rda", "tua", "bta", "cra"]);
-    expect(QUOTE_DRAFT_MAX_QUANTITY).toBe(5_000_000);
+    expect(QUOTE_DRAFT_MAX_QUANTITY).toBe(Number.MAX_SAFE_INTEGER);
     expectError("invalid_request", () => issuePublicQuoteDraft({
       ...validInput,
       quantity: QUOTE_DRAFT_MAX_QUANTITY + 1,

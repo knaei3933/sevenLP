@@ -294,7 +294,6 @@ export function EmbeddedQuoteDraftForm() {
             data-testid="quote-draft-quantity"
             id="quote-draft-quantity"
             inputMode="numeric"
-            max={5_000_000}
             min={rule.minimumQuantity}
             name="quantity"
             onChange={(event) => setQuantity(Number(event.target.value))}

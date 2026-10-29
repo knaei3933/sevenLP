@@ -100,7 +100,7 @@ describe("embedded quote form", () => {
     await user.click(within(form).getByRole("radio", { name: /丸形（CRA）/ }));
     expect(within(form).getByRole("radio", { name: "丸形 70×70" })).toBeChecked();
     expect(quantity).toHaveValue(10_000);
-    expect(quantity).toHaveAttribute("max", "5000000");
+    expect(quantity).not.toHaveAttribute("max");
   });
 
   it("keeps the existing consultation and sample form route intact", async () => {

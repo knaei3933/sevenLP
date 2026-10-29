@@ -1166,12 +1166,12 @@
   display: grid;
   justify-items: center;
   align-content: start;
-  gap: 6px;
-  min-height: 162px;
+  gap: 9px;
+  min-height: 228px;
   border: 1px solid var(--lp-line-strong);
   border-radius: var(--lp-radius-md);
   background: #fff;
-  padding: 16px 12px 44px;
+  padding: 18px 14px 48px;
   text-align: center;
   cursor: pointer;
   transition: border-color .18s var(--sp-motion-ease), box-shadow .18s var(--sp-motion-ease), transform .18s var(--sp-motion-ease);
@@ -1200,8 +1200,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 72px;
-  height: 52px;
+  width: 132px;
+  height: 118px;
 }
 
 .designMedia img {

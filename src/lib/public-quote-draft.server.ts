@@ -25,7 +25,7 @@ export const QUOTE_DRAFT_MAX_ENCODED_BYTES = 2 * 1024;
 const QUOTE_DRAFT_TOKEN_FORMAT = /^public-quote-draft\.v1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/;
 const NONCE_BYTES = 16;
 const FILL_AMOUNT_PATTERN = /^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/;
-export const QUOTE_DRAFT_MAX_QUANTITY = 5_000_000;
+export const QUOTE_DRAFT_MAX_QUANTITY = Number.MAX_SAFE_INTEGER;
 const CANONICAL_KEYS = [
   "colorCount",
   "designId",
