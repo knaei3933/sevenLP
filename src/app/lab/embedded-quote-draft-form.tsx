@@ -14,7 +14,7 @@ import {
 
 import styles from "./page.module.css";
 import craPouch from "./images/generated/CRA-real-skincare.png";
-import btaPouch from "./images/generated/BTA-real-premium.png";
+import btaPouch from "./images/generated/BTA-real.png";
 import rdaPouch from "./images/generated/RDA-real-edited.png";
 import tuaPouch from "./images/generated/TUA-real-edited.png";
 import xraPouch from "./images/generated/XRA-real-rounded.png";

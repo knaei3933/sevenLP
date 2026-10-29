@@ -5,7 +5,7 @@ import { LabRequestForm } from "./lab-request-form";
 import { EmbeddedQuoteDraftForm } from "./embedded-quote-draft-form";
 import rdaPouch from "./images/generated/RDA-real-edited.png";
 import tuaPouch from "./images/generated/TUA-real-edited.png";
-import btaPouch from "./images/generated/BTA-real-premium.png";
+import btaPouch from "./images/generated/BTA-real.png";
 import craPouch from "./images/generated/CRA-real-skincare.png";
 import spaPouch from "./images/generated/SPA-real-beauty-drink.png";
 import xraPouch from "./images/generated/XRA-real-rounded.png";
@@ -20,6 +20,7 @@ const heroSpecs = [
 
 const headerNavItems = [
   { href: "#lab-products", label: "製品仕様" },
+  { href: "#lab-liquids", label: "対応液剤" },
   { href: "/lab#lab-quote", label: "見積もり" },
   { href: "#lab-quality", label: "品質体制" },
   { href: "#lab-process", label: "進め方" },
@@ -71,8 +72,8 @@ const pouchShapes = [
   {
     code: "BTA",
     name: "ボトル型",
-    usage: "美容ドリンク・液体サンプルの配布に。",
-    useCaseTags: ["美容ドリンク", "液体サンプル"],
+    usage: "美容液・化粧水などのボトルタイプに。",
+    useCaseTags: ["美容液", "化粧水", "ボトルタイプ"],
     size: "35×60〜70×120",
     capacity: "1〜10g",
     minimumQuantity: "10,000枚〜／上限なし",
@@ -93,8 +94,8 @@ const pouchShapes = [
   {
     code: "SPA",
     name: "スポイトボトル型",
-    usage: "ポイント付け・少量液体の正確な配布に。",
-    useCaseTags: ["ポイント付け", "少量液体"],
+    usage: "美容液などのポイント付与に。",
+    useCaseTags: ["美容液", "ポイント付け"],
     size: "35×80",
     capacity: "1g",
     minimumQuantity: "50,000枚〜／上限なし",
@@ -164,6 +165,48 @@ const qualityCapabilities = [
   },
 ];
 
+const liquidCategories = [
+  {
+    title: "スキンケア・基礎化粧品",
+    examples: ["化粧水", "美容液", "乳液", "液状クリーム"],
+    note: "水系・乳化系のトライアルや単回サンプルに適した少量充填です。",
+  },
+  {
+    title: "ヘア・ボディケア",
+    examples: ["トリートメント", "ヘアオイル", "ボディローション"],
+    note: "粘度・比重に合わせて充填口と計量条件を確認します。",
+  },
+  {
+    title: "メイクアップ・UVケア",
+    examples: ["化粧下地", "液状ファンデーション", "UVミルク"],
+    note: "顔料分散や沈降の安定性は、見本充填で確認します。",
+  },
+  {
+    title: "クレンジング・トイレタリー",
+    examples: ["クレンジング", "洗顔料", "アフターシャンローション"],
+    note: "低粘度から高粘度まで、内容物の性状ごとに可否を整理します。",
+  },
+];
+
+const liquidChecks = [
+  {
+    label: "粘度・比重",
+    value: "流動性から高粘度まで、充填方式と計量精度を確認します。",
+  },
+  {
+    label: "分散・安定性",
+    value: "分離・沈降・経時変化を支給バルクの見本で確認します。",
+  },
+  {
+    label: "材料適合性",
+    value: "液剤とフィルム、シール部の相容性を確認します。",
+  },
+  {
+    label: "衛生・品質条件",
+    value: "GMP準拠の品質管理とISO22716準拠システムで進行します。",
+  },
+];
+
 const useCases = [
   {
     title: "スキンケアサンプル",
@@ -182,8 +225,8 @@ const useCases = [
     text: "アメニティ、施術後の携帯サンプル、セット販売の検討。",
   },
   {
-    title: "健康食品・飲料関連",
-    text: "液体・半固形の試供品条件を内容物ごとに確認。",
+    title: "クレンジング・洗い流し",
+    text: "クレンジングオイル、洗顔料、パック液などの使用感確認。",
   },
   {
     title: "販促・イベント",
@@ -277,25 +320,26 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
               <p className={styles.kicker}>
-                <span aria-hidden="true">化粧品・トイレタリー向け</span>
-                SMALL-LOT POUCH FILLING
+                <span aria-hidden="true">化粧品液剤の小ロット充填</span>
+                COSMETIC LIQUID POUCH FILLING
               </p>
               <h1 id="lab-brand" className={styles.brand}>
-                小容量パウチを、1万枚から仕様入力だけで進める。
+                化粧品の液剤を、小容量パウチに1万枚から充填。
               </h1>
               <p className={styles.affiliation}>Epackage Labのパウチ充填専門サービス</p>
               <p className={styles.lead}>
-                ラウンド・ボトル・チューブなど6形状を比較しながら、充填量・チャンバー・印刷条件を整理。お客様支給バルクを、日本語サポートで見積もり・サンプル依頼まで進められます。
+                化粧水・美容液・乳液などの液剤を、ラウンド・チューブ・ボトルなど6形状へ充填。お客様支給バルクを前提に、充填量・チャンバー・印刷条件を日本語サポートで整理します。
               </p>
               <div className={styles.actions}>
                 <a className={styles.primaryAction} href="/lab#lab-quote">
-                  形状と数量を選んで見積もりを確認
+                  液剤と形状を選んで見積もりを確認
                 </a>
                 <a className={styles.secondaryAction} href="?requestType=consultation#lab-request">
                   条件が未確定なら相談から始める
                 </a>
               </div>
-              <ul className={styles.heroProof} aria-label="サービスの信頼性">
+              <ul className={styles.heroProof} aria-label="対応液剤とサービスの信頼性">
+                <li>化粧水・美容液・乳液</li>
                 <li>GMP準拠の品質管理</li>
                 <li>ISO22716準拠システム</li>
                 <li>見本確認・検品</li>
@@ -357,14 +401,56 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </ul>
         </section>
 
+        <section id="lab-liquids" className={`${styles.section} ${styles.liquidSection}`} aria-labelledby="lab-liquids-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>対応液剤｜LIQUIDS</p>
+            <h2 className={styles.sectionHeading} id="lab-liquids-heading">
+              充填するのは、化粧品・トイレタリーの液剤です
+            </h2>
+            <p className={styles.sectionLead}>
+              スキンケアを中心に、美容液・乳液・ヘアケア・UVケアなどの液剤を小容量パウチへ充填します。支給バルクの処方条件を確認しながら、サンプルから量産へ進められます。
+            </p>
+          </div>
+          <ul className={styles.liquidGrid}>
+            {liquidCategories.map((category) => (
+              <li key={category.title} className={styles.liquidCard}>
+                <h3>{category.title}</h3>
+                <ul className={styles.liquidExamples} aria-label={`${category.title}の例`}>
+                  {category.examples.map((example) => <li key={example}>{example}</li>)}
+                </ul>
+                <p>{category.note}</p>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.liquidCheckPanel}>
+            <div>
+              <p className={styles.productionLabel}>充填適性確認｜CHECK</p>
+              <p className={styles.liquidCheckLead}>
+                同じ化粧品液剤でも処方によって条件が変わります。次の項目を支給バルクと見本充填で確認します。
+              </p>
+            </div>
+            <dl className={styles.liquidCheckGrid}>
+              {liquidChecks.map((check) => (
+                <div key={check.label}>
+                  <dt>{check.label}</dt>
+                  <dd>{check.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className={styles.sectionNote}>
+              ※対応可否は処方・粘度・比重・材料適合性により変わります。支給バルクの見本確認後に確定します。
+            </p>
+          </div>
+        </section>
+
         <section id="lab-products" className={`${styles.section} ${styles.productSection}`} aria-labelledby="lab-products-heading">
           <div className={styles.sectionHead}>
             <p className={styles.sectionLabel}>製品仕様｜PRODUCTS</p>
             <h2 className={styles.sectionHeading} id="lab-products-heading">
-              6形状を、最短10,000枚から製造
+              化粧品液剤を、6形状で最短10,000枚から製造
             </h2>
             <p className={styles.sectionLead}>
-              見本用の小ロットではなく、量産前提の小容量パウチとして条件を揃えます。形状・充填量・連結・印刷を選び、最短10,000枚から製造に進められます。SPAのみ50,000枚からです。上限数量の設定はありません。
+              見本用の小ロットではなく、量産前提の小容量パウチとして条件を揃えます。化粧水・美容液・乳液などの液剤に合わせて形状・充填量・連結・印刷を選べます。SPAのみ50,000枚からです。上限数量の設定はありません。
             </p>
           </div>
           <ul className={styles.shapeCardGrid}>

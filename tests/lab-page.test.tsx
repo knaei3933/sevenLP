@@ -9,10 +9,15 @@ describe("public lab identity", () => {
   it("renders Japanese-first brand, affiliation, conversion actions, and contact", async () => {
     render(await LabPage({ searchParams: Promise.resolve({}) }));
 
-    expect(screen.getByRole("heading", { level: 1, name: "小容量パウチを、1万枚から仕様入力だけで進める。" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "化粧品の液剤を、小容量パウチに1万枚から充填。" })).toBeInTheDocument();
     expect(screen.getAllByText("Epackage Labのパウチ充填専門サービス").length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: "形状と数量を選んで見積もりを確認" })).toHaveAttribute("href", "/lab#lab-quote");
+    expect(screen.getByRole("link", { name: "液剤と形状を選んで見積もりを確認" })).toHaveAttribute("href", "/lab#lab-quote");
     expect(screen.getByRole("link", { name: "条件が未確定なら相談から始める" })).toHaveAttribute("href", "?requestType=consultation#lab-request");
+    expect(screen.getByRole("link", { name: "対応液剤" })).toHaveAttribute("href", "#lab-liquids");
+    expect(screen.getByRole("heading", { level: 2, name: "充填するのは、化粧品・トイレタリーの液剤です" })).toBeInTheDocument();
+    expect(screen.getByText("スキンケア・基礎化粧品")).toBeInTheDocument();
+    expect(screen.getAllByText("美容液").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("乳液").length).toBeGreaterThan(0);
     expect(screen.getAllByText("化粧水").length).toBeGreaterThan(0);
     expect(screen.getAllByText("単回使い切り").length).toBeGreaterThan(0);
     expect(screen.queryByRole("link", { name: "サンプル・仕様を相談" })).not.toBeInTheDocument();

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 const title = "パウチ充填ラボ | Epackage Lab";
-const description = "化粧品・トイレタリー向けの小容量パウチ充填サービス。ラウンド・ボトル・チューブなど6形状を最短10,000枚から製造し、無料見積もりやサンプル依頼を日本語で進められます。";
+const description = "化粧水・美容液・乳液などの化粧品液剤を小容量パウチへ充填するサービス。スキンケア・ヘアケア・UVケアなど6形状を最短10,000枚から製造し、無料見積もりやサンプル依頼を日本語で進められます。";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 

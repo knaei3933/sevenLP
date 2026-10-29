@@ -1755,6 +1755,106 @@
   line-height: 1.8;
 }
 
+.liquidSection {
+  background: #fff;
+}
+
+.liquidGrid {
+  display: grid;
+  gap: 14px;
+  width: min(1160px, 100%);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.liquidCard {
+  height: 100%;
+  border: var(--lp-border);
+  border-top: 3px solid var(--lp-brand);
+  border-radius: var(--lp-radius-md);
+  background: #fff;
+  padding: 22px;
+  box-shadow: 0 10px 22px rgba(84, 35, 46, .05);
+}
+
+.liquidCard h3 {
+  margin: 0;
+  color: var(--lp-brand-deep);
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.liquidExamples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liquidExamples li {
+  border: 1px solid var(--lp-mint);
+  border-radius: 999px;
+  background: var(--lp-mist);
+  color: var(--lp-brand-deep);
+  padding: 6px 11px;
+  font-size: .8rem;
+  font-weight: 750;
+}
+
+.liquidCard p {
+  margin: 14px 0 0;
+  color: var(--lp-muted);
+  font-size: .87rem;
+  line-height: 1.85;
+}
+
+.liquidCheckPanel {
+  display: grid;
+  gap: 26px;
+  width: min(1160px, 100%);
+  margin: 32px auto 0;
+  border: 1px solid var(--lp-mint);
+  border-radius: var(--lp-radius-lg);
+  background: var(--lp-mist);
+  padding: clamp(20px, 3vw, 32px);
+}
+
+.liquidCheckLead {
+  margin: 10px 0 0;
+  color: var(--lp-muted);
+  font-size: .94rem;
+  line-height: 1.9;
+}
+
+.liquidCheckGrid {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.liquidCheckGrid div {
+  border: var(--lp-border);
+  border-radius: var(--lp-radius-sm);
+  background: #fff;
+  padding: 16px;
+}
+
+.liquidCheckGrid dt {
+  color: var(--lp-brand-deep);
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+.liquidCheckGrid dd {
+  margin: 6px 0 0;
+  color: var(--lp-muted);
+  font-size: .85rem;
+  line-height: 1.8;
+}
+
 .usecaseSection {
   background: var(--lp-mist);
 }
@@ -1981,6 +2081,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .liquidGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .liquidCheckGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .usecaseGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2069,6 +2177,14 @@
   }
 
   .valueGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .liquidGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .liquidCheckGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
