@@ -1109,6 +1109,7 @@
   border: 0;
   padding: 0;
   min-width: 0;
+  scroll-margin-top: 124px;
 }
 
 .stepLabel {
