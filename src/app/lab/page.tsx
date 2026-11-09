@@ -9,6 +9,15 @@ import btaPouch from "./images/generated/BTA-real-premium.png";
 import craPouch from "./images/generated/CRA-real-skincare.png";
 import spaPouch from "./images/generated/SPA-real-beauty-drink.png";
 import xraPouch from "./images/generated/XRA-real-rounded.png";
+import sevenProductSkincare from "./images/seven/seven-1.png";
+import sevenProductMakeup from "./images/seven/seven-2.png";
+import sevenProductHaircare from "./images/seven/seven-3.png";
+import sevenFacilitySkincare from "./images/seven/seven-4.jpg";
+import sevenFacilityFilling01 from "./images/seven/seven-5.jpg";
+import sevenFacilityFilling02 from "./images/seven/seven-6.jpg";
+import sevenFacilityFilling03 from "./images/seven/seven-7.jpg";
+import sevenStrengthSmallLot from "./images/seven/seven-8.jpg";
+import sevenStrengthIso22716 from "./images/seven/seven-9.jpg";
 import qualityControl from "./images/quality-control.webp";
 import sampleSachets from "./images/sample-sachets.webp";
 
@@ -181,6 +190,47 @@ const sampleSet = [
   { code: "RDA", label: "ラウンド 50×80mm", use: "化粧水・美容液の定番タイプ" },
   { code: "TUA", label: "チューブ 35×80mm", use: "ヘアケア・トリートメント向け" },
   { code: "BTA", label: "ボトル型 35×80mm", use: "美容液・ボトルタイプ向け" },
+];
+
+const productionPartner = {
+  name: "株式会社セブン化学",
+  englishName: "SEVEN CHEMICAL CO., LTD.",
+  founded: "1961年（昭和36年）1月",
+  capital: "2,727万円",
+  location: "大阪府柏原市太平寺1丁目12番1号",
+  business: "化粧品・医薬部外品の研究・開発・製造・OEM（受託製造）",
+  certifications: "ISO22716認証取得工場",
+};
+
+const productionCapabilities = [
+  {
+    title: "小ロット・多品種製造",
+    text: "小規模でも多様な製造・充填設備を備え、スキンケアからメイクアップ、ヘアケアまで幅広い製品に対応します。",
+  },
+  {
+    title: "本社・工場・研究の近接体制",
+    text: "同一敷地内の本社・工場・研究施設が連携し、処方・容器・充填条件の課題に柔軟に対応します。",
+  },
+  {
+    title: "ISO22716認証取得",
+    text: "化粧品製造の品質管理・安全管理に関する国際規格ISO22716を取得した管理体制で製造します。",
+  },
+  {
+    title: "処方実績と製造ノウハウ",
+    text: "1961年の設立以来、多数の処方実績と製造ノウハウを蓄積し、化粧品から医薬部外品まで対応します。",
+  },
+];
+
+const productionGallery = [
+  { src: sevenProductSkincare, alt: "セブン化学で製造できるスキンケア製品の分類イメージ", caption: "Skin care" },
+  { src: sevenProductMakeup, alt: "セブン化学で製造できるメイクアップ製品の分類イメージ", caption: "Makeup" },
+  { src: sevenProductHaircare, alt: "セブン化学で製造できるヘアケア製品の分類イメージ", caption: "Hair care" },
+  { src: sevenFacilitySkincare, alt: "セブン化学のスキンケア製造設備", caption: "スキンケア製造設備" },
+  { src: sevenFacilityFilling01, alt: "セブン化学の充填・包装設備", caption: "充填・包装設備" },
+  { src: sevenFacilityFilling02, alt: "セブン化学の充填・包装設備", caption: "充填・包装設備" },
+  { src: sevenFacilityFilling03, alt: "セブン化学の充填・包装設備", caption: "充填・包装設備" },
+  { src: sevenStrengthSmallLot, alt: "セブン化学が小ロット・多品種に対応していることを示す画像", caption: "小ロット・多品種" },
+  { src: sevenStrengthIso22716, alt: "セブン化学のISO22716認証取得工場としての体制を示す画像", caption: "ISO22716" },
 ];
 
 const liquidCategories = [
@@ -390,7 +440,7 @@ const faqGroups: FaqGroup[] = [
     items: [
       {
         question: "生産工場の所在地を教えてください。",
-        answer: "製造は日本国内の認証取得生産体制で管理しています。工場名・所在地・担当者などの生産情報は一般公開しておらず、NDA締結と発注条件確定後に必要な範囲のみご案内します。",
+        answer: "製造拠点は大阪府柏原市にあり、株式会社セブン化学が担当しています。生産設備や現場担当者などの詳細は、NDA締結と発注条件確定後に必要な範囲のみご案内します。",
       },
       {
         question: "生産工場へ直接問い合わせや発注はできますか？",
@@ -555,14 +605,14 @@ export default async function LabPage({ searchParams }: LabPageProps) {
             </article>
             <article className={styles.companyCard}>
               <p className={styles.companyBadge}>単一窓口ポリシー</p>
-              <h3>生産現場へ直接依頼せず、条件も非公開で管理</h3>
+              <h3>生産はセブン化学、ご発注は金井貿易株式会社の単一窓口</h3>
               <p>
-                品質責任と情報管理のため、ご相談・お見積もり・ご発注・仕様変更・品質対応はすべてEpackage Lab窓口で行います。
+                製造は認証取得工場の株式会社セブン化学が担当し、ご相談・お見積もり・ご発注・仕様変更・品質対応はすべて金井貿易株式会社のEpackage Lab窓口で一括管理します。
               </p>
               <ul className={styles.companyPoints}>
-                <li>NDA締結後に必要範囲の情報のみ共有</li>
-                <li>工場名・所在地は公開しない</li>
-                <li>発注確定後にバルク送付先をご案内</li>
+                <li>製造パートナー：株式会社セブン化学</li>
+                <li>ご発注・条件変更：Epackage Labのみ</li>
+                <li>NDA締結後に機密情報を共有</li>
                 <li>仕様変更・品質対応も一括受付</li>
               </ul>
               <div className={styles.companyActions}>
@@ -830,6 +880,75 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               </dl>
             </div>
           </div>
+        </section>
+
+        <section id="lab-production" className={`${styles.section} ${styles.productionPartnerSection}`} aria-labelledby="lab-production-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionLabel}>生産パートナー｜PRODUCTION PARTNER</p>
+            <h2 className={styles.sectionHeading} id="lab-production-heading">
+              株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造
+            </h2>
+            <p className={styles.sectionLead}>
+              製造は1961年設立の株式会社セブン化学が担当し、ご相談・お見積もり・ご発注は金井貿易株式会社のEpackage Labが一括窓口として管理します。
+            </p>
+          </div>
+
+          <div className={styles.productionProfileGrid}>
+            <article className={styles.productionProfileCard}>
+              <p className={styles.productionBadge}>製造担当事業者</p>
+              <h3>{productionPartner.name}</h3>
+              <p className={styles.productionEnglish}>{productionPartner.englishName}</p>
+              <dl>
+                <div><dt>所在地</dt><dd>{productionPartner.location}</dd></div>
+                <div><dt>設立</dt><dd>{productionPartner.founded}</dd></div>
+                <div><dt>資本金</dt><dd>{productionPartner.capital}</dd></div>
+                <div><dt>事業内容</dt><dd>{productionPartner.business}</dd></div>
+                <div><dt>品質認証</dt><dd>{productionPartner.certifications}</dd></div>
+              </dl>
+            </article>
+
+            <article className={styles.productionGovernanceCard}>
+              <p className={styles.productionBadge}>ご発注・進行管理</p>
+              <h3>金井貿易株式会社 / Epackage Lab</h3>
+              <p>
+                製造と販売窓口を分離し、責任を明確にしています。お客様との契約、お見積もり、仕様調整、発注、検品対応はEpackage Labが一括して行います。
+              </p>
+              <ul>
+                <li>ご相談・お見積もりはEpackage Labのみ</li>
+                <li>セブン化学への直接発注は受けていません</li>
+                <li>NDA後に処方・デザイン条件を共有</li>
+                <li>品質対応・進行管理も一括受付</li>
+              </ul>
+            </article>
+          </div>
+
+          <div className={styles.productionCapabilityGrid}>
+            {productionCapabilities.map((capability) => (
+              <article key={capability.title}>
+                <h3>{capability.title}</h3>
+                <p>{capability.text}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.productionGalleryGrid}>
+            {productionGallery.map((item) => (
+              <figure key={`${item.caption}-${item.src}`}>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 92vw"
+                  className={styles.productionGalleryImage}
+                />
+                <figcaption>{item.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <p className={styles.sectionNote}>
+            ※製造・生産体制に関する詳細は、株式会社セブン化学の公開情報および正式契約条件に基づいてご案内します。
+          </p>
         </section>
 
         <section className={`${styles.section} ${styles.usecaseSection}`} aria-labelledby="lab-usecase-heading">

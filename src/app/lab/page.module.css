@@ -2081,6 +2081,215 @@
   }
 }
 
+.productionPartnerSection {
+  background: #fff;
+}
+
+.productionProfileGrid {
+  display: grid;
+  gap: 16px;
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+.productionProfileCard,
+.productionGovernanceCard {
+  border: var(--lp-border);
+  border-top: 4px solid var(--lp-brand);
+  border-radius: var(--lp-radius-lg);
+  background: #fff;
+  padding: clamp(20px, 3vw, 32px);
+  box-shadow: 0 18px 36px rgba(84, 35, 46, .06);
+}
+
+.productionGovernanceCard {
+  border-top-color: var(--lp-brand-deep);
+  background: var(--lp-canvas-soft);
+}
+
+.productionBadge {
+  margin: 0 0 14px;
+  color: var(--lp-brand-text);
+  font-size: .76rem;
+  font-weight: 850;
+  letter-spacing: .14em;
+}
+
+.productionProfileCard h3,
+.productionGovernanceCard h3 {
+  margin: 0;
+  color: var(--lp-brand-deep);
+  font-size: clamp(1.22rem, 2.4vw, 1.6rem);
+  line-height: 1.4;
+}
+
+.productionEnglish {
+  margin: 7px 0 0;
+  color: var(--lp-muted);
+  font-size: .8rem;
+  font-weight: 750;
+  letter-spacing: .1em;
+}
+
+.productionProfileCard dl {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 0;
+}
+
+.productionProfileCard dl div {
+  border-top: 1px solid var(--lp-mint);
+  padding-top: 11px;
+}
+
+.productionProfileCard dt {
+  color: var(--lp-muted);
+  font-size: .74rem;
+  font-weight: 750;
+}
+
+.productionProfileCard dd {
+  margin: 4px 0 0;
+  color: var(--lp-ink);
+  font-size: .92rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.productionSiteLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  margin-top: 22px;
+  border: 1px solid var(--lp-brand);
+  border-radius: var(--lp-radius-sm);
+  color: var(--lp-brand-deep);
+  padding: 10px 16px;
+  font-size: .88rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.productionSiteLink:hover {
+  background: var(--lp-mist);
+}
+
+.productionGovernanceCard p {
+  margin: 18px 0 0;
+  color: var(--lp-muted);
+  font-size: .9rem;
+  line-height: 1.9;
+}
+
+.productionGovernanceCard ul {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.productionGovernanceCard li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--lp-ink);
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.7;
+}
+
+.productionGovernanceCard li::before {
+  content: "";
+  position: absolute;
+  top: .62em;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lp-brand);
+}
+
+.productionCapabilityGrid {
+  display: grid;
+  gap: 14px;
+  width: min(1160px, 100%);
+  margin: 18px auto 0;
+}
+
+.productionCapabilityGrid article {
+  height: 100%;
+  border: 1px solid var(--lp-mint);
+  border-radius: var(--lp-radius-md);
+  background: var(--lp-mist);
+  padding: 20px;
+}
+
+.productionCapabilityGrid h3 {
+  margin: 0;
+  color: var(--lp-brand-deep);
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.productionCapabilityGrid p {
+  margin: 10px 0 0;
+  color: var(--lp-muted);
+  font-size: .86rem;
+  line-height: 1.85;
+}
+
+.productionGalleryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: min(1160px, 100%);
+  margin: 22px auto 0;
+}
+
+.productionGalleryGrid figure {
+  position: relative;
+  min-height: 190px;
+  margin: 0;
+  border: var(--lp-border);
+  border-radius: var(--lp-radius-md);
+  background: #fff;
+  overflow: hidden;
+}
+
+.productionGalleryImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+  padding: 12px;
+}
+
+.productionGalleryGrid figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  border-top: 1px solid var(--lp-mint);
+  background: rgba(255, 255, 255, .94);
+  color: var(--lp-brand-deep);
+  padding: 9px 12px;
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+@media (min-width: 640px) {
+  .productionGalleryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .productionCapabilityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .usecaseSection {
   background: var(--lp-mist);
 }
@@ -2464,6 +2673,20 @@
 
   .sampleCards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .productionProfileGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .productionCapabilityGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .productionGalleryGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
   }
 
   .heroStats {

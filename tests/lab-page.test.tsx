@@ -64,10 +64,21 @@ describe("public lab identity", () => {
     expect(within(faq).getByText("お支払い条件を教えてください。")).toBeInTheDocument();
     expect(within(faq).getByText("生産工場の所在地を教えてください。")).toBeInTheDocument();
     expect(within(faq).getByText("生産工場へ直接問い合わせや発注はできますか？")).toBeInTheDocument();
-    expect(faq.textContent).not.toContain("セブン化学");
-    expect(faq.textContent).not.toContain("7chemical.co.jp");
-    expect(faq.textContent).not.toContain("柏原市");
+    expect(faq.textContent).toContain("株式会社セブン化学");
+    expect(faq.textContent).toContain("大阪府柏原市");
     expect(within(faq).getByText("処方やデザインデータの機密保持はできますか？")).toBeInTheDocument();
+  });
+
+  it("exposes Seven Chemical as manufacturer and Kanai Trading as sole order window", async () => {
+    render(await LabPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("heading", { level: 2, name: "株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造" })).toBeInTheDocument();
+    expect(screen.getByText("株式会社セブン化学")).toBeInTheDocument();
+    expect(screen.getAllByText("大阪府柏原市太平寺1丁目12番1号").length).toBeGreaterThan(0);
+    expect(screen.getByText("ご発注・進行管理")).toBeInTheDocument();
+    expect(screen.getByText("金井貿易株式会社 / Epackage Lab")).toBeInTheDocument();
+    expect(screen.getByText("セブン化学への直接発注は受けていません")).toBeInTheDocument();
+    expect(screen.getAllByAltText(/セブン化学/).length).toBeGreaterThan(0);
   });
 
   it("explains production and quality conditions without hiding SPA's minimum", async () => {
@@ -76,7 +87,7 @@ describe("public lab identity", () => {
     expect(screen.getByText("量産条件｜PRODUCTION")).toBeInTheDocument();
     expect(screen.getByText("SPAは50,000枚〜")).toBeInTheDocument();
     expect(screen.getByText("1961年設立")).toBeInTheDocument();
-    expect(screen.getByText("ISO22716")).toBeInTheDocument();
+    expect(screen.getAllByText("ISO22716").length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "充填条件を確定しやすくする体制" })).toBeInTheDocument();
   });
 });
