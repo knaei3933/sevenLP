@@ -491,7 +491,16 @@ export default async function LabPage({ searchParams }: LabPageProps) {
 
       <header className={styles.siteHeader}>
         <div className={styles.headerInner}>
-          <p className={styles.headerBrand}>セブン化学 パウチ充填ラボ</p>
+          <div className={styles.headerBrand}>
+            <Image
+              src="/seven-chemical/logo.svg"
+              alt="株式会社セブン化学 パウチ充填ラボ"
+              width={94}
+              height={42}
+              unoptimized
+            />
+            <span className={styles.headerBrandLabel}>パウチ充填ラボ</span>
+          </div>
           <nav className={styles.headerNav} aria-label="メインナビゲーション">
             <ul>
               {headerNavItems.map((item) => (
@@ -508,6 +517,16 @@ export default async function LabPage({ searchParams }: LabPageProps) {
         <section className={styles.hero} aria-labelledby="lab-brand">
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
+              <div className={styles.heroLogo}>
+                <Image
+                  src="/seven-chemical/logo.svg"
+                  alt="株式会社セブン化学"
+                  width={180}
+                  height={80}
+                  priority
+                  unoptimized
+                />
+              </div>
               <p className={styles.kicker}>
                 <span aria-hidden="true">株式会社セブン化学の化粧品液剤充填</span>
                 SEVEN CHEMICAL POUCH FILLING
@@ -844,6 +863,14 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           <div className={styles.productionProfileGrid}>
             <article className={styles.productionProfileCard}>
               <p className={styles.productionBadge}>製造担当事業者</p>
+              <Image
+                src="/seven-chemical/logo.svg"
+                alt="株式会社セブン化学"
+                width={220}
+                height={98}
+                className={styles.productionLogo}
+                unoptimized
+              />
               <h3>{productionPartner.name}</h3>
               <p className={styles.productionEnglish}>{productionPartner.englishName}</p>
               <dl>
@@ -988,6 +1015,16 @@ export default async function LabPage({ searchParams }: LabPageProps) {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div>
+            <div className={styles.footerLogoWrap}>
+              <Image
+                src="/seven-chemical/logo.svg"
+                alt="株式会社セブン化学"
+                width={180}
+                height={80}
+                className={styles.footerLogo}
+                unoptimized
+              />
+            </div>
             <p className={styles.footerBrand}>セブン化学 パウチ充填ラボ</p>
             <p className={styles.footerAffiliation}>運営：金井貿易株式会社</p>
             <p className={styles.footerNote}>

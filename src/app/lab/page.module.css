@@ -84,13 +84,41 @@
 }
 
 .headerBrand {
-  margin: 0;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  gap: 12px;
+  min-height: 52px;
+}
+
+.headerBrandLabel {
   color: var(--lp-brand-deep);
   font-size: 1.06rem;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.heroLogo {
+  margin: -12px 0 18px;
+}
+
+.heroLogo img {
+  width: clamp(170px, 22vw, 230px);
+  height: auto;
+}
+
+.footerLogoWrap {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 16px;
+  border-radius: var(--lp-radius-sm);
+  background: #fff;
+  padding: 12px 16px;
+}
+
+.footerLogoWrap img {
+  display: block;
+  width: 180px;
+  height: auto;
 }
 
 .headerNav {
@@ -2082,6 +2110,12 @@
   color: var(--lp-brand-deep);
   font-size: clamp(1.22rem, 2.4vw, 1.6rem);
   line-height: 1.4;
+}
+
+.productionLogo {
+  width: 220px;
+  height: auto;
+  margin-bottom: 18px;
 }
 
 .productionEnglish {
