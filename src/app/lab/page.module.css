@@ -2082,18 +2082,13 @@
 }
 
 .productionProfileCard,
-.productionGovernanceCard {
+.productionCapabilityFeature {
   border: var(--lp-border);
   border-top: 4px solid var(--lp-brand);
   border-radius: var(--lp-radius-lg);
   background: #fff;
   padding: clamp(20px, 3vw, 32px);
   box-shadow: 0 18px 36px rgba(84, 35, 46, .06);
-}
-
-.productionGovernanceCard {
-  border-top-color: var(--lp-brand-deep);
-  background: var(--lp-canvas-soft);
 }
 
 .productionBadge {
@@ -2105,7 +2100,7 @@
 }
 
 .productionProfileCard h3,
-.productionGovernanceCard h3 {
+.productionCapabilityFeature h3 {
   margin: 0;
   color: var(--lp-brand-deep);
   font-size: clamp(1.22rem, 2.4vw, 1.6rem);
@@ -2167,41 +2162,6 @@
 
 .productionSiteLink:hover {
   background: var(--lp-mist);
-}
-
-.productionGovernanceCard p {
-  margin: 18px 0 0;
-  color: var(--lp-muted);
-  font-size: .9rem;
-  line-height: 1.9;
-}
-
-.productionGovernanceCard ul {
-  display: grid;
-  gap: 10px;
-  margin: 20px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.productionGovernanceCard li {
-  position: relative;
-  padding-left: 20px;
-  color: var(--lp-ink);
-  font-size: .9rem;
-  font-weight: 650;
-  line-height: 1.7;
-}
-
-.productionGovernanceCard li::before {
-  content: "";
-  position: absolute;
-  top: .62em;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--lp-brand);
 }
 
 .productionCapabilityGrid {

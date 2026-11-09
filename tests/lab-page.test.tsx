@@ -69,15 +69,15 @@ describe("public lab identity", () => {
     expect(within(faq).getByText("処方やデザインデータの機密保持はできますか？")).toBeInTheDocument();
   });
 
-  it("exposes Seven Chemical as manufacturer and Kanai Trading as sole order window", async () => {
+  it("exposes Seven Chemical as the front-facing manufacturer", async () => {
     render(await LabPage({ searchParams: Promise.resolve({}) }));
 
-    expect(screen.getByRole("heading", { level: 2, name: "株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造します" })).toBeInTheDocument();
     expect(screen.getByText("株式会社セブン化学")).toBeInTheDocument();
     expect(screen.getAllByText("大阪府柏原市太平寺1丁目12番1号").length).toBeGreaterThan(0);
-    expect(screen.getByText("ご発注・進行管理")).toBeInTheDocument();
-    expect(screen.getByText("金井貿易株式会社 / Epackage Lab")).toBeInTheDocument();
-    expect(screen.getByText("セブン化学への直接発注は受けていません")).toBeInTheDocument();
+    expect(screen.getByText("製造の強み")).toBeInTheDocument();
+    expect(screen.getByText("化粧品・医薬部外品を、処方開発から充填まで一貫対応")).toBeInTheDocument();
+    expect(screen.getAllByText("小ロット・多品種製造").length).toBeGreaterThan(0);
     expect(screen.getAllByAltText(/セブン化学/).length).toBeGreaterThan(0);
   });
 

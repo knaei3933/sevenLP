@@ -424,8 +424,8 @@ const faqGroups: FaqGroup[] = [
     ],
   },
   {
-    title: "ご注文窓口・生産情報",
-    lead: "品質責任と情報管理のため、生産情報とご発注はEpackage Lab窓口で一元管理します。",
+    title: "製造体制・生産情報",
+    lead: "株式会社セブン化学の製造体制と、発注前後の確認事項です。",
     items: [
       {
         question: "生産工場の所在地を教えてください。",
@@ -433,11 +433,11 @@ const faqGroups: FaqGroup[] = [
       },
       {
         question: "生産工場へ直接問い合わせや発注はできますか？",
-        answer: "できません。ご相談、お見積もり、ご発注、仕様変更、品質対応は、すべてEpackage Labの専任窓口で一括管理します。品質責任と情報管理を明確にするため、直接のご依頼はお控えください。",
+        answer: "ご相談・お見積もり・ご発注は、本サービスの窓口からお願いします。品質責任と情報管理を明確にするため、生産現場への直接依頼は行わないでください。",
       },
       {
         question: "工場見学や監査は可能ですか？",
-        answer: "NDA・ご契約後に、目的と範囲によって対応を調整します。ご見学の場合もEpackage Labが立会い、直接の交渉や発注は行いません。",
+        answer: "NDA・ご契約後に、目的と範囲によって対応を調整します。製造条件や機密情報を扱うため、立ち会い・訪問日程は事前に調整します。",
       },
       {
         question: "支給バルクの送付先はどこですか？",
@@ -445,7 +445,7 @@ const faqGroups: FaqGroup[] = [
       },
       {
         question: "進行中の相談・変更・クレームはどこに連絡すればよいですか？",
-        answer: "すべてEpackage Labの窓口にご連絡ください。フォーム・メールのどちらからでも日本語で対応できます。生産現場との直接調整が必要な場合はEpackage Labが間に入ります。",
+        answer: "本サービスのお問い合わせフォーム・メールからご連絡ください。日本語で対応でき、生産現場との調整もセブン化学の製造体制をもとに進めます。",
       },
     ],
   },
@@ -658,7 +658,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               化粧品液剤を、6形状で最短10,000枚から製造
             </h2>
             <p className={styles.sectionLead}>
-              見本用の小ロットではなく、量産前提の小容量パウチとして条件を揃えます。化粧水・美容液・乳液などの液剤に合わせて形状・充填量・連結・印刷を選べます。SPAのみ50,000枚からです。上限数量の設定はありません。
+              セブン化学の製造設備で、量産前提の小容量パウチを作ります。化粧水・美容液・乳液などの液剤に合わせて形状・充填量・連結・印刷を選べます。SPAのみ50,000枚からです。上限数量の設定はありません。
             </p>
           </div>
           <ul className={styles.shapeCardGrid}>
@@ -825,7 +825,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
                 <p className={styles.sectionLabel}>充填・品質体制｜QUALITY</p>
                 <h2 className={styles.sectionHeading} id="lab-quality-heading">充填条件を確定しやすくする体制</h2>
                 <p className={styles.sectionLead}>
-                  1961年設立以来の化粧品・医薬部外品製造経験と、ISO22716認証取得工場の品質体制を条件整理に活かします。処方・設備・充填・検査の確認項目を見積もり前に揃え、小ロット・多品種でも進行条件を見失わないようにします。
+                  株式会社セブン化学の1961年設立以来の化粧品・医薬部外品製造経験と、ISO22716認証取得工場の品質体制を活かします。処方・設備・充填・検査の確認項目を見積もり前に揃え、小ロット・多品種でも進行条件を見失わないようにします。
                 </p>
               </div>
               <dl className={styles.qualityStats} aria-label="品質体制の指標">
@@ -851,12 +851,12 @@ export default async function LabPage({ searchParams }: LabPageProps) {
 
         <section id="lab-production" className={`${styles.section} ${styles.productionPartnerSection}`} aria-labelledby="lab-production-heading">
           <div className={styles.sectionHead}>
-            <p className={styles.sectionLabel}>生産パートナー｜PRODUCTION PARTNER</p>
+            <p className={styles.sectionLabel}>セブン化学製造｜PRODUCTION</p>
             <h2 className={styles.sectionHeading} id="lab-production-heading">
-              株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造
+              株式会社セブン化学の認証工場で、化粧品・医薬部外品を製造します
             </h2>
             <p className={styles.sectionLead}>
-              製造は1961年設立の株式会社セブン化学が担当し、ご相談・お見積もり・ご発注は金井貿易株式会社のEpackage Labが一括窓口として管理します。
+              1961年設立の株式会社セブン化学が、化粧品・医薬部外品の処方開発から製造、充填まで一貫して対応します。小ロット・多品種とISO22716認証工場の品質体制を活かします。
             </p>
           </div>
 
@@ -882,17 +882,17 @@ export default async function LabPage({ searchParams }: LabPageProps) {
               </dl>
             </article>
 
-            <article className={styles.productionGovernanceCard}>
-              <p className={styles.productionBadge}>ご発注・進行管理</p>
-              <h3>金井貿易株式会社 / Epackage Lab</h3>
+            <article className={styles.productionCapabilityFeature}>
+              <p className={styles.productionBadge}>製造の強み</p>
+              <h3>化粧品・医薬部外品を、処方開発から充填まで一貫対応</h3>
               <p>
-                製造と販売窓口を分離し、責任を明確にしています。お客様との契約、お見積もり、仕様調整、発注、検品対応はEpackage Labが一括して行います。
+                セブン化学は、同じ敷地内に本社・工場・研究機能を持ちます。化粧水や美容液などのスキンケア液剤から、メイクアップ・ヘアケア・医薬部外品まで、多数の処方実績をもとに製造条件を整理します。
               </p>
               <ul>
-                <li>ご相談・お見積もりはEpackage Labのみ</li>
-                <li>セブン化学への直接発注は受けていません</li>
-                <li>NDA後に処方・デザイン条件を共有</li>
-                <li>品質対応・進行管理も一括受付</li>
+                <li>小ロット・多品種製造</li>
+                <li>ISO22716認証取得工場</li>
+                <li>スキンケア・粉体・充填包装設備</li>
+                <li>処方実績と長年の製造ノウハウ</li>
               </ul>
             </article>
           </div>
