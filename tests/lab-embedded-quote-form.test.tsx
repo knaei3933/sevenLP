@@ -21,10 +21,11 @@ describe("embedded quote form", () => {
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/public/lab/quote-drafts");
     const fields = form.querySelectorAll("input:not([type='hidden'])[name]");
-    expect(fields).toHaveLength(24);
-    expect(form.querySelectorAll("input[name='fillAmount']")).toHaveLength(1);
+    expect(fields).toHaveLength(29);
+    expect(form.querySelectorAll("input[name='fillAmount']")).toHaveLength(6);
     expect([...fields].map((field) => field.getAttribute("name"))).toEqual([
       ...Array.from({ length: 5 }, () => "designId"),
+      ...Array.from({ length: 5 }, () => "fillAmount"),
       ...Array.from({ length: 8 }, () => "sizeKey"),
       ...Array.from({ length: 10 }, () => "colorCount"),
       "quantity",

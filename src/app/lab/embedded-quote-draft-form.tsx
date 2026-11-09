@@ -174,6 +174,7 @@ export function EmbeddedQuoteDraftForm() {
                   className={styles.visualHiddenInput}
                   data-testid="quote-draft-fill"
                   disabled={disabled}
+                  name="fillAmount"
                   onChange={() => selectFill(amount)}
                   type="radio"
                   value={amount}

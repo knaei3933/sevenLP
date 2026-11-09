@@ -211,7 +211,8 @@ const productionCapabilities = [
 ];
 
 const productionGallery = [
-  { src: sevenProductSkincare, alt: "セブン化学で製造できるスキンケア製品の分類イメージ", caption: "Skin care" },
+  { id: "product-skincare",
+  src: sevenProductSkincare, alt: "セブン化学で製造できるスキンケア製品の分類イメージ", caption: "Skin care" },
   { src: sevenProductMakeup, alt: "セブン化学で製造できるメイクアップ製品の分類イメージ", caption: "Makeup" },
   { src: sevenProductHaircare, alt: "セブン化学で製造できるヘアケア製品の分類イメージ", caption: "Hair care" },
   { src: sevenFacilitySkincare, alt: "セブン化学のスキンケア製造設備", caption: "スキンケア製造設備" },
@@ -907,8 +908,8 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           </div>
 
           <div className={styles.productionGalleryGrid}>
-            {productionGallery.map((item) => (
-              <figure key={`${item.caption}-${item.src}`}>
+            {productionGallery.map((item, index) => (
+              <figure key={`${item.caption}-${index}`}>
                 <Image
                   src={item.src}
                   alt={item.alt}
