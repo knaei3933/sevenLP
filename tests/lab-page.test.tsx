@@ -9,8 +9,8 @@ describe("public lab identity", () => {
   it("renders Japanese-first brand, affiliation, conversion actions, and contact", async () => {
     render(await LabPage({ searchParams: Promise.resolve({}) }));
 
-    expect(screen.getByRole("heading", { level: 1, name: "化粧品の液剤を、小容量パウチに1万枚から充填。" })).toBeInTheDocument();
-    expect(screen.getAllByText("Epackage Labのパウチ充填専門サービス").length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { level: 1, name: "セブン化学の製造設備で、化粧品の液剤を1万枚から充填。" })).toBeInTheDocument();
+    expect(screen.getAllByText("製造：株式会社セブン化学 / 運営：金井貿易株式会社").length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: "液剤と形状を選んで見積もりを確認" })).toHaveAttribute("href", "/lab#lab-quote");
     expect(screen.getByRole("link", { name: "条件が未確定なら相談から始める" })).toHaveAttribute("href", "?requestType=consultation#lab-request");
     expect(screen.getByRole("link", { name: "対応液剤" })).toHaveAttribute("href", "#lab-liquids");

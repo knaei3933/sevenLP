@@ -175,17 +175,6 @@ const qualityCapabilities = [
   },
 ];
 
-const companyProfile = {
-  legalName: "金井貿易株式会社",
-  legalNameEnglish: "KANAI TRADING CO., LTD.",
-  brand: "Epackage Lab",
-  postalCode: "〒673-0892",
-  address: "兵庫県明石市本町2-1-29 みなとメゾン明石本町2F",
-  email: "shapepouch@package-lab.com",
-  telephone: "050-3613-9673",
-  website: "https://kanei-trade.co.jp/",
-};
-
 const sampleSet = [
   { code: "RDA", label: "ラウンド 50×80mm", use: "化粧水・美容液の定番タイプ" },
   { code: "TUA", label: "チューブ 35×80mm", use: "ヘアケア・トリートメント向け" },
@@ -502,7 +491,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
 
       <header className={styles.siteHeader}>
         <div className={styles.headerInner}>
-          <p className={styles.headerBrand}>パウチ充填ラボ</p>
+          <p className={styles.headerBrand}>セブン化学 パウチ充填ラボ</p>
           <nav className={styles.headerNav} aria-label="メインナビゲーション">
             <ul>
               {headerNavItems.map((item) => (
@@ -520,13 +509,13 @@ export default async function LabPage({ searchParams }: LabPageProps) {
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
               <p className={styles.kicker}>
-                <span aria-hidden="true">化粧品液剤の小ロット充填</span>
-                COSMETIC LIQUID POUCH FILLING
+                <span aria-hidden="true">株式会社セブン化学の化粧品液剤充填</span>
+                SEVEN CHEMICAL POUCH FILLING
               </p>
               <h1 id="lab-brand" className={styles.brand}>
-                化粧品の液剤を、小容量パウチに1万枚から充填。
+                セブン化学の製造設備で、化粧品の液剤を1万枚から充填。
               </h1>
-              <p className={styles.affiliation}>Epackage Labのパウチ充填専門サービス</p>
+              <p className={styles.affiliation}>製造：株式会社セブン化学 / 運営：金井貿易株式会社</p>
               <p className={styles.lead}>
                 化粧水・美容液・乳液などの液剤を、ラウンド・チューブ・ボトルなど6形状へ充填。お客様支給バルクを前提に、充填量・チャンバー・印刷条件を日本語サポートで整理します。
               </p>
@@ -578,47 +567,6 @@ export default async function LabPage({ searchParams }: LabPageProps) {
             <p className={styles.specNote}>
               ※充填量と最小ロットは形状により異なります。SPAは50,000枚〜です。
             </p>
-          </div>
-        </section>
-
-        <section id="lab-operator" className={`${styles.section} ${styles.companySection}`} aria-labelledby="lab-company-heading">
-          <div className={styles.sectionHead}>
-            <p className={styles.sectionLabel}>運営・品質体制｜COMPANY</p>
-            <h2 className={styles.sectionHeading} id="lab-company-heading">
-              金井貿易株式会社が、Epackage Labとして一括窓口を担当します
-            </h2>
-            <p className={styles.sectionLead}>
-              ご相談からお見積もり、ご発注、品質対応までの窓口はEpackage Labに一元化しています。生産情報はNDAと発注条件の確定後に、必要な範囲のみご案内します。
-            </p>
-          </div>
-          <div className={styles.companyGrid}>
-            <article className={styles.companyCard}>
-              <p className={styles.companyBadge}>運営会社</p>
-              <h3>{companyProfile.legalName}</h3>
-              <p className={styles.companyEnglish}>{companyProfile.legalNameEnglish}</p>
-              <dl>
-                <div><dt>ブランド</dt><dd>{companyProfile.brand}</dd></div>
-                <div><dt>所在地</dt><dd>{companyProfile.postalCode}<br />{companyProfile.address}</dd></div>
-                <div><dt>お問い合わせ</dt><dd>{companyProfile.email}<br />{companyProfile.telephone}</dd></div>
-                <div><dt>公式サイト</dt><dd><a href={companyProfile.website} target="_blank" rel="noopener noreferrer">kanei-trade.co.jp</a></dd></div>
-              </dl>
-            </article>
-            <article className={styles.companyCard}>
-              <p className={styles.companyBadge}>単一窓口ポリシー</p>
-              <h3>生産はセブン化学、ご発注は金井貿易株式会社の単一窓口</h3>
-              <p>
-                製造は認証取得工場の株式会社セブン化学が担当し、ご相談・お見積もり・ご発注・仕様変更・品質対応はすべて金井貿易株式会社のEpackage Lab窓口で一括管理します。
-              </p>
-              <ul className={styles.companyPoints}>
-                <li>製造パートナー：株式会社セブン化学</li>
-                <li>ご発注・条件変更：Epackage Labのみ</li>
-                <li>NDA締結後に機密情報を共有</li>
-                <li>仕様変更・品質対応も一括受付</li>
-              </ul>
-              <div className={styles.companyActions}>
-                <a className={styles.buttonPrimary} href="?requestType=consultation#lab-request">信頼条件について相談する</a>
-              </div>
-            </article>
           </div>
         </section>
 
@@ -1040,8 +988,8 @@ export default async function LabPage({ searchParams }: LabPageProps) {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div>
-            <p className={styles.footerBrand}>パウチ充填ラボ</p>
-            <p className={styles.footerAffiliation}>運営：金井貿易株式会社 / Epackage Labのパウチ充填専門サービス</p>
+            <p className={styles.footerBrand}>セブン化学 パウチ充填ラボ</p>
+            <p className={styles.footerAffiliation}>運営：金井貿易株式会社</p>
             <p className={styles.footerNote}>
               掲載画像はイメージです。仕様・対応範囲はお見積もり時に確認します。
             </p>
@@ -1058,7 +1006,7 @@ export default async function LabPage({ searchParams }: LabPageProps) {
             </ul>
           </nav>
         </div>
-        <p className={styles.copyright}>&copy; 金井貿易株式会社 / パウチ充填ラボ</p>
+        <p className={styles.copyright}>&copy; 株式会社セブン化学 × 金井貿易株式会社</p>
       </footer>
     </>
   );

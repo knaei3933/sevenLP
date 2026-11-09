@@ -105,8 +105,8 @@ test("keeps /, /lab, and /lab/ anonymous and shows the Japanese public identity"
   for (const path of ["/", "/lab", "/lab/"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/^(?:.*\/|.*\/lab\/?)$/);
-    await expect(page.getByRole("heading", { level: 1, name: "化粧品の液剤を、小容量パウチに1万枚から充填。" })).toBeVisible();
-    await expect(page.getByText("Epackage Labのパウチ充填専門サービス").first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "セブン化学の製造設備で、化粧品の液剤を1万枚から充填。" })).toBeVisible();
+    await expect(page.getByText("製造：株式会社セブン化学 / 運営：金井貿易株式会社").first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "仕様の見極めから納品条件まで" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "充填条件を確定しやすくする体制" })).toBeVisible();
     const contact = page.getByRole("link", { name: "shapepouch@package-lab.com" });
